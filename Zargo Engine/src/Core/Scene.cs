@@ -83,8 +83,12 @@ namespace ZargoEngine
             
             if (camera.Pitch > 89.0f)       camera.Pitch = 89.0f;
             else if (camera.Pitch < -89.0f) camera.Pitch = -89.0f;
-            else                            camera.Pitch -= deltaX * cameraSens; 
-            
+            else                            camera.Pitch -= deltaX * cameraSens;
+
+            if (camera.Yaw > 89.0f)       camera.Yaw = 89.0f;
+            else if (camera.Yaw < -89.0f) camera.Yaw = -89.0f;
+            else                          camera.Yaw -= deltaY * cameraSens;
+
 
             if (Game.instance.IsKeyDown(Keys.W))         camera.Position += camera.Front * speed; //Forward 
             if (Game.instance.IsKeyDown(Keys.S))         camera.Position -= camera.Front * speed; //Backwards

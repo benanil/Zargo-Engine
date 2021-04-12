@@ -12,7 +12,6 @@ namespace MiddleGames.Engine
     public struct Vertex
     {
         public Vector3 pos, norm;
-        public static readonly int Stride = Marshal.SizeOf(default(Vertex));
     }
 
     struct Face
@@ -44,12 +43,6 @@ namespace MiddleGames.Engine
 
 		public Mesh(string filename)
 		{
-			Load(filename);
-		}
-
-		// Load and parse the .OBJ file
-		private int Load(string filename)
-		{
 			int numVertices = 0;
 			int numNormals = 0;
 			int numFaces = 0;
@@ -59,9 +52,9 @@ namespace MiddleGames.Engine
 			string[] lines;
 
 			using (StreamReader reader = new StreamReader(filename))
-            {
+			{
 				lines = reader.ReadToEnd().Split('\n');
-            }
+			}
 
 			foreach (string line in lines)
 			{
@@ -83,14 +76,14 @@ namespace MiddleGames.Engine
 					case "f":
 						string[] point0 = tokens[1].Split('/');
 						string[] point1 = tokens[2].Split('/');
-					    string[] point2 = tokens[3].Split('/');
+						string[] point2 = tokens[3].Split('/');
 
-						Face face = new Face()
+						Face face = new ()
 						{
 							v1  = Convert.ToInt32(point0[0]) - 1,
 							uv1 = Convert.ToInt32(point0[1]) - 1,
 							vn1 = Convert.ToInt32(point0[2]) - 1,
-
+							 
 							v2  = Convert.ToInt32(point1[0]) - 1,
 							uv2 = Convert.ToInt32(point0[1]) - 1,
 							vn2 = Convert.ToInt32(point1[2]) - 1,
@@ -121,8 +114,6 @@ namespace MiddleGames.Engine
 			Console.WriteLine("numVertices" + numVertices);
 			Console.WriteLine("numNormals" + numNormals);
 			Console.WriteLine("numFaces" + numFaces);
-
-			return 0;
 		}
 
 		private void loadVbo()
@@ -138,7 +129,7 @@ namespace MiddleGames.Engine
 			// Vertex position data
 			GL.GenBuffers(1, out vboId);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
-			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Vertex.Stride * modelData.Count), modelData.ToArray(), BufferUsageHint.StaticDraw);
+			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Marshal.SizeOf(default(Vertex)) * modelData.Count), modelData.ToArray(), BufferUsageHint.StaticDraw);
 
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
 			Console.WriteLine(GL.GetError());
@@ -150,21 +141,12 @@ namespace MiddleGames.Engine
 			const int LAYOUT_MAX_INDEX = 5 * sizeof(float); // VERTEX_SIZE_BYTES in largo engine
 			
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
-			GL.VertexAttribPointer(0, POS_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, POS_OFFSET);     // layout 0
+			GL.VertexAttribPointer(0, POS_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, POS_OFFSET);          // layout 0
 			GL.VertexAttribPointer(1, TexCoord_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, TexCoord_OFFSET);// layout 1
-
-			GL.EnableVertexAttribArray(0);
-			GL.EnableVertexAttribArray(1);
-			GL.DisableVertexAttribArray(2);
-			GL.DisableVertexAttribArray(3);
 
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboId);
 
 			GL.BindVertexArray(0);
-			GL.EnableVertexAttribArray(0);
-			GL.EnableVertexAttribArray(1);
-			GL.EnableVertexAttribArray(2);
-			GL.EnableVertexAttribArray(3);
 
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -172,12 +154,14 @@ namespace MiddleGames.Engine
 
 		public void Draw()
 		{
+			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
 			GL.BindVertexArray(vaoId);
 
 			GL.EnableVertexAttribArray(0); // position Layout
 			GL.EnableVertexAttribArray(1); // TexCoord Layout
 
 			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt,indices.ToArray());
+			GL.DrawElements(PrimitiveType.Triangles, vertices.Count, DrawElementsType.UnsignedInt,vertices.ToArray());
 
 			GL.DisableVertexAttribArray(0);
 			GL.DisableVertexAttribArray(1);

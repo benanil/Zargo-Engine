@@ -8,16 +8,17 @@ namespace ZargoEngine.Engine
 {
     public static class AssetManager
     {
-        public static Dictionary<string,Shader > Shaders  = new Dictionary<string,Shader>();
-        public static Dictionary<string,Texture> Textures = new Dictionary<string,Texture>();
+        private static readonly Dictionary<string,Shader > Shaders  = new Dictionary<string,Shader>();
+        private static readonly Dictionary<string,Texture> Textures = new Dictionary<string,Texture>();
 
         public static Shader GetShader(string vertexPath, string fragmentPath)
         {
             if (Shaders.ContainsKey(fragmentPath)){
                 return Shaders[fragmentPath];
             }
-
-            return new Shader(vertexPath,fragmentPath);
+            var shader = new Shader(vertexPath, fragmentPath);
+            Shaders.Add(vertexPath, shader);
+            return shader;
         }
 
         public static Texture GetTexture(string path,TextureUnit textureUnit)
@@ -28,8 +29,9 @@ namespace ZargoEngine.Engine
                 }
                 return Textures[path]; //
             }
-         
-            return new Texture(path);
+            var texture = new Texture(path);
+            Textures.Add(path,texture);
+            return texture;
         }
 
         public static void DisposeAllShaders()

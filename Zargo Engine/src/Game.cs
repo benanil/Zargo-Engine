@@ -14,7 +14,18 @@ namespace MiddleGames
 {
     public class Game : GameWindow
     {
-        public static Game instance;
+        private static Game _instance;
+        public static Game instance 
+        {
+            get
+            { 
+                return _instance;
+            }
+            private set
+            {
+                _instance = value;
+            }
+        }
 
         public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
@@ -29,6 +40,7 @@ namespace MiddleGames
             CursorGrabbed = true;
 
             Time.Start();
+
             var shader = new Shader("../../Assets/Shaders/BasicVert.hlsl", "../../Assets/Shaders/BasicFrag.hlsl");
             var firstMesh = new Mesh("../../Assets/cube.obj");
             var texture = new Texture("../../Assets/Images/wood_img.jpg");
@@ -36,10 +48,16 @@ namespace MiddleGames
 
             Scene scene = new(camera,"first Scene");
 
-            var firstObject = new GameObject("firstObject", new Transform());
-
-            scene.AddGameObject(firstObject);
-            scene.AddMeshRenderer(new MeshRenderer(firstObject, shader, firstMesh, texture));
+            // create cubes
+            for (int x = 0; x < 10; x++){
+                for (int y = 0; y < 10; y++){
+                    for (int z = 0; z < 10; z++){
+                        var go = new GameObject("go" + x + y + z, new Transform(new Vector3(x,y,z), Quaternion.Identity));
+                        scene.AddGameObject(go);
+                        scene.AddMeshRenderer(new MeshRenderer(go, shader, firstMesh, texture));
+                    }
+                }
+            }
 
             SceneManager.AddScene(scene);
             SceneManager.LoadScene(0); // starts first scene 

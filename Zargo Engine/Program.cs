@@ -1,5 +1,4 @@
 ﻿using MiddleGames;
-using System;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Mathematics;
 
@@ -21,10 +20,8 @@ namespace ZargoEngine
                 Size = new Vector2i(800, 500),
             };
 
-            using (Game game = new Game(gameWindowSettings,nativeWindowSettings))
-            {
-                game.Run();
-            }
+            using Game game = new(gameWindowSettings, nativeWindowSettings);
+            game.Run();
         }
     }
 }

@@ -27,8 +27,8 @@ namespace ZargoEngine.Rendering
             shader.Use();
 
             shader.SetMatrix4("model",gameObject.transform.Translation);
-            shader.SetMatrix4("View", camera.WorldView);
-            shader.SetMatrix4("Projection", camera.Projection);
+            shader.SetMatrix4("View", camera.GetViewMatrix());
+            shader.SetMatrix4("Projection", camera.GetProjectionMatrix());
             
             mesh.Draw();
 

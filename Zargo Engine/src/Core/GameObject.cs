@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using ZargoEngine.src.Core;
 
@@ -9,7 +10,7 @@ namespace ZargoEngine
         public string name;
         public Transform transform;
 
-        private List<Behaviour> components = new List<Behaviour>();
+        private List<Behaviour> behaviours = new List<Behaviour>();
 
         public GameObject(string name,Transform transform){
             this.name = name;
@@ -18,21 +19,26 @@ namespace ZargoEngine
         }
 
         public void Start(){
-            for (int i = 0; i < components.Count; i++){
-                components[i].Start();
+            for (int i = 0; i < behaviours.Count; i++){
+                behaviours[i].Start();
             }
         }
 
         public void Update()
         {
-            for (int i = 0; i < components.Count; i++){
-                components[i].Update();
+            for (int i = 0; i < behaviours.Count; i++){
+                behaviours[i].Update();
             }
         }
 
         public void AddComponent(Behaviour component)
         {
-            components.Add(component);
+            behaviours.Add(component);
+        }
+
+        public Behaviour GetBehaviour(Type type)
+        {
+            return behaviours.Find(x => x.GetType() == type);
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿
 using OpenTK.Graphics.ES30;
+using OpenTK.Mathematics;
 using System;
 using System.IO;
 
@@ -8,14 +9,13 @@ namespace MiddleGames.Engine.Rendering
     public class Shader : IDisposable
     {
 
-        private readonly int Handle;
+        private readonly int program; // tutorial handle deniyor
         private bool disposedValue = false;
 
         public Shader(string vertexPath, string fragmentPath)
         {
             string vertexShaderSource;
             string fragmentShaderSource;
-            string shaderLog;
 
             using (StreamReader reader = new StreamReader(vertexPath))
             {
@@ -52,36 +52,79 @@ namespace MiddleGames.Engine.Rendering
             }
 
             // link Shaders
-            Handle = GL.CreateProgram();
+            program = GL.CreateProgram();
 
-            GL.AttachShader(Handle, vertexShader);
-            GL.AttachShader(Handle, fragmentShader);
+            GL.AttachShader(program, vertexShader);
+            GL.AttachShader(program, fragmentShader);
 
-            GL.LinkProgram(Handle);
+            GL.LinkProgram(program);
 
             // clear memory
-            GL.DetachShader(Handle, vertexShader);
-            GL.DetachShader(Handle, fragmentShader);
+            GL.DetachShader(program, vertexShader);
+            GL.DetachShader(program, fragmentShader);
             GL.DeleteShader(fragmentShader);
             GL.DeleteShader(vertexShader);
         }
 
         public void Use()
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(program);
+        }
+
+        public void Detach()
+        {
+            GL.UseProgram(0);
+        }
+
+        public int GetAttribLocation(string name)
+        {
+            return GL.GetAttribLocation(program, name);
+        }
+
+        // Uniforms
+
+        public void SetInt(string name, int value){
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform1(location, value);
+        }
+
+        public void SetFloat(string name, float value){
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform1(location, value);
+        }
+
+        public void SetVector2(string name, Vector2 value){
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform2(location, value);
+        }
+
+        public void SetVector3(string name, Vector3 value){
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform3(location, value);
+        }
+
+        public void SetVector4(string name, Vector4 value){
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform4(location, value);
+        }
+
+        public void SetMatrix4(string name, Matrix4 value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.UniformMatrix4(location,true, ref value);
         }
 
         // disposing
 
         ~Shader()
         {
-            GL.DeleteProgram(Handle);
+            GL.DeleteProgram(program);
         }
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue){
-                GL.DeleteProgram(Handle);
+                GL.DeleteProgram(program);
                 disposedValue = true;
             }
         }

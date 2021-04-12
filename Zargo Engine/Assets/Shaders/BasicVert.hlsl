@@ -1,20 +1,16 @@
-﻿
-#version 330 core
+﻿#version 330 core
 
-in vec3 InVertex;
-in vec3 InNormal;
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec2 aTexCoord;
 
+out vec2 texCoord;
 
-smooth out vec3 LightVector0;
-smooth out vec3 EyeNormal;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
-uniform mat4 ProjectionModelviewMatrix;
-
-
-void main()
+void main(void)
 {
-    gl_Position = ProjectionModelviewMatrix * vec4(InVertex, 1.0);
-
-    LightVector0 = vec3(1.0, 1.0, 1.0);
-    EyeNormal = InNormal;
+    texCoord = aTexCoord;
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

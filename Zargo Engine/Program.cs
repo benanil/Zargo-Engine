@@ -1,14 +1,29 @@
-﻿using System;
+﻿using MiddleGames;
+using System;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Mathematics;
 
-namespace Zargo_Engine
+namespace ZargoEngine
 {
     class Program
     {
         static void Main(string[] args)
         {
-            using (Game game = new Game(700, 500, GraphicsMode.Default, "Mesh Wiewer"))
+            GameWindowSettings gameWindowSettings = new GameWindowSettings()
             {
-                game.Run(60.0);
+                IsMultiThreaded = true,
+                UpdateFrequency = 1 / 60,
+            };
+
+            NativeWindowSettings nativeWindowSettings = new NativeWindowSettings()
+            {
+                Title = "Zargo Engine",
+                Size = new Vector2i(800, 500),
+            };
+
+            using (Game game = new Game(gameWindowSettings,nativeWindowSettings))
+            {
+                game.Run();
             }
         }
     }

@@ -8,11 +8,14 @@ using MiddleGames.Engine.Rendering;
 using ZargoEngine;
 using ZargoEngine.Rendering;
 using ZargoEngine.Engine;
+using OpenTK.Mathematics;
 
 namespace MiddleGames
 {
     public class Game : GameWindow
     {
+        public static Game instance;
+
         public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
         {
 
@@ -20,13 +23,18 @@ namespace MiddleGames
 
         protected override void OnLoad()
         {
+            instance = this;
+
+            CursorVisible = false;
+            CursorGrabbed = true;
+
             Time.Start();
             var shader = new Shader("../../Assets/Shaders/BasicVert.hlsl", "../../Assets/Shaders/BasicFrag.hlsl");
             var firstMesh = new Mesh("../../Assets/cube.obj");
             var texture = new Texture("../../Assets/Images/wood_img.jpg");
-            var camera = new Camera(Camera.CameraRenderMode.Perspective, 90, Size.X, Size.Y);
+            var camera = new Camera(new Vector3(-2,1,0), Size.X, Size.Y);
 
-            Scene scene = new Scene(camera,"first Scene");
+            Scene scene = new(camera,"first Scene");
 
             var firstObject = new GameObject("firstObject", new Transform());
 
@@ -56,7 +64,6 @@ namespace MiddleGames
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-
             SceneManager.currentScene.Render();
 
             SwapBuffers();
@@ -65,9 +72,8 @@ namespace MiddleGames
         protected override void OnResize(ResizeEventArgs e)
         {
             GL.Viewport(0, 0, e.Width, e.Height);
-            SceneManager.currentScene.camera.ViewportWidth = e.Width;
-            SceneManager.currentScene.camera.ViewportWidth = e.Height;
-            SceneManager.currentScene.camera.ReCalculate();
+            SceneManager.currentScene.camera.ScreenWidth  = e.Width;
+            SceneManager.currentScene.camera.ScreenHeight = e.Height;
 
             base.OnResize(e);
         }

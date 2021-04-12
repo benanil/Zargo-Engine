@@ -1,57 +1,110 @@
-﻿using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
+using System;
 
 namespace MiddleGames.Engine.Rendering
 {
     public class Camera
     {
-        public enum CameraRenderMode
-        { 
-            Orthographic, Perspective
-        }
+        // Those vectors are directions pointing outwards from the camera to define how it rotated
+        private Vector3 _front = -Vector3.UnitZ;
+        private Vector3 _up    =  Vector3.UnitY;
+        private Vector3 _right =  Vector3.UnitX;
 
-        // Size of the viewport
-        public int ViewportWidth { get; set; }
-        public int ViewportHeight { get; set; }
+        public Vector3 Front => _front;
+        public Vector3 Up => _up;
+        public Vector3 Right => _right;
+        
+        // Rotation around the X axis (radians)
+        private float _pitch;
 
-        // Near = the closest a vertex can be before not being rendered
-        public float NearPlane { get; set; }
-        // Far = rendering distance basically. if vertex is too far away, dont render.
-        public float FarPlane { get; set; }
-        // Fov is how much is seen on screen sort of.
-        public float FOV { get; set; }
+        // Rotation around the Y axis (radians)
+        private float _yaw = -MathHelper.PiOver2; // Without this you would be started rotated 90 degrees right
 
-        // The matrix containing information for projecting the worldview matrix
-        public Matrix4 Projection { get; set; }
-        // A matrix containing info about how to move around the world around the camera... sort of
-        // this is normally set as a player's worldview
-        public Matrix4 WorldView { get; set; }
+        // The field of view of the camera (radians)
+        private float _fov = 45f;
 
-        public Camera(CameraRenderMode renderMode,float fov, int ViewportWidth , int ViewportHeight, float far = 10000, float near = .1f)
+        public int ScreenWidth, ScreenHeight;
+
+        public Camera(Vector3 position, int ScreenWidth, int ScreenHeight)
         {
-            this.ViewportHeight = ViewportHeight;
-            this.ViewportWidth = ViewportWidth;
-
-            NearPlane = near;
-            FarPlane = far;
-
+            Position = position;
+            this.ScreenHeight = ScreenHeight;
+            this.ScreenWidth = ScreenWidth;
         }
 
-        public void ReCalculate()
-        { 
-            Projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45.0f), ViewportWidth / ViewportHeight, NearPlane, FarPlane);
-            WorldView = Matrix4.CreateTranslation(0.0f, 0.0f, -3.0f);
-        }
+        // The position of the camera
+        public Vector3 Position { get; set; }
 
-        // Returns the camera's viewing matrix
-        public Matrix4 Matrix()
+        // This is simply the aspect ratio of the viewport, used for the projection matrix
+        public float AspectRatio => ScreenWidth / ScreenHeight;
+
+        // We convert from degrees to radians as soon as the property is set to improve performance
+        public float Pitch
         {
-            return Projection * WorldView;
+            get => MathHelper.RadiansToDegrees(_pitch);
+            set
+            {
+                // We clamp the pitch value between -89 and 89 to prevent the camera from going upside down, and a bunch
+                // of weird "bugs" when you are using euler angles for rotation.
+                // If you want to read more about this you can try researching a topic called gimbal lock
+                var angle = MathHelper.Clamp(value, -89f, 89f);
+                _pitch = MathHelper.DegreesToRadians(angle);
+                UpdateVectors();
+            }
         }
 
-        public void UseViewport()
+        // We convert from degrees to radians as soon as the property is set to improve performance
+        public float Yaw
         {
-            GL.Viewport(0, 0, ViewportWidth, ViewportHeight);
+            get => MathHelper.RadiansToDegrees(_yaw);
+            set
+            {
+                _yaw = MathHelper.DegreesToRadians(value);
+                UpdateVectors();
+            }
+        }
+
+        // The field of view (FOV) is the vertical angle of the camera view, this has been discussed more in depth in a
+        // previous tutorial, but in this tutorial you have also learned how we can use this to simulate a zoom feature.
+        // We convert from degrees to radians as soon as the property is set to improve performance
+        public float Fov
+        {
+            get => MathHelper.RadiansToDegrees(_fov);
+            set
+            {
+                var angle = MathHelper.Clamp(value, 1f, 45f);
+                _fov = MathHelper.DegreesToRadians(angle);
+            }
+        }
+
+        // Get the view matrix using the amazing LookAt function described more in depth on the web tutorials
+        public Matrix4 GetViewMatrix()
+        {
+            return Matrix4.LookAt(Position, Position + _front, _up);
+        }
+
+        // Get the projection matrix using the same method we have used up until this point
+        public Matrix4 GetProjectionMatrix()
+        {
+            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
+        }
+
+        // This function is going to update the direction vertices using some of the math learned in the web tutorials
+        private void UpdateVectors()
+        {
+            // First the front matrix is calculated using some basic trigonometry
+            _front.X = MathF.Cos(_pitch) * MathF.Cos(_yaw);
+            _front.Y = MathF.Sin(_pitch);
+            _front.Z = MathF.Cos(_pitch) * MathF.Sin(_yaw);
+
+            // We need to make sure the vectors are all normalized, as otherwise we would get some funky results
+            _front = Vector3.Normalize(_front);
+
+            // Calculate both the right and the up vector using cross product
+            // Note that we are calculating the right from the global up, this behaviour might
+            // not be what you need for all cameras so keep this in mind if you do not want a FPS camera
+            _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
+            _up = Vector3.Normalize(Vector3.Cross(_right, _front));
         }
     }
 }

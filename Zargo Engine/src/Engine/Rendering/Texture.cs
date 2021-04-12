@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL4;
 
 using SixLabors.ImageSharp;
@@ -7,14 +8,17 @@ using SixLabors.ImageSharp.Processing;
 
 namespace ZargoEngine.Rendering
 {
-    public class Texture
+    public class Texture : IDisposable
     {
         private readonly int texId;
         public readonly int width;
         public readonly int height;
+        public readonly TextureUnit TexCoord;
 
         public Texture(string path, TextureUnit TexCoord = TextureUnit.Texture0) // TEXCOORD0 in cgprogram
         {
+            this.TexCoord = TexCoord;
+
             Image<Rgba32> image = Image.Load<Rgba32>(path);
 
             width = image.Width;
@@ -43,16 +47,19 @@ namespace ZargoEngine.Rendering
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
         }
 
-        public void Bind()
-        {
+        public void Bind(){
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texId);
         }
 
-        public void Unbind()
-        {
+        public void Unbind(){
             GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
+        public void Dispose()
+        {
+            GL.DeleteTexture(texId);
+            GC.SuppressFinalize(this);
+        }
     }
 }

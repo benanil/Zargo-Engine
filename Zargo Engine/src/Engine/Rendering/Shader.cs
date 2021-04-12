@@ -59,6 +59,8 @@ namespace MiddleGames.Engine.Rendering
 
             GL.LinkProgram(program);
 
+            Console.WriteLine("shader compiled sucsesfully");
+
             // clear memory
             GL.DetachShader(program, vertexShader);
             GL.DetachShader(program, fragmentShader);

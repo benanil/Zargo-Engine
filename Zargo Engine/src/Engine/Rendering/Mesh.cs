@@ -8,15 +8,15 @@ using System.Runtime.InteropServices;
 
 namespace MiddleGames.Engine
 {
-
     public struct Vertex
     {
-        public Vector3 pos, norm;
+		public Vector3 pos, norm;
+		public Vector2 TexCoord;
     }
 
     struct Face
     {
-        public int v1, v2, v3;    // vertex indices
+        public int vp1, vp2, vp3;    // vertex indices
 		public int uv1, uv2, uv3; // uv indices
 		public int vn1, vn2, vn3; // normal indices
     }
@@ -25,10 +25,12 @@ namespace MiddleGames.Engine
 	{
 
 		private const int POS_SIZE = 3;
-		private const int TexCoord_SIZE = 2;
+		private const int NORM_SIZE = 3;
+		private const int TEXCOORD_SIZE = 2;
 
 		private const int POS_OFFSET = 0;
-		private const int TexCoord_OFFSET = POS_OFFSET + POS_SIZE * sizeof(float);
+		private const int NORMAL_OFFSET = POS_OFFSET + POS_SIZE * sizeof(float);
+		private const int TEXCOORD_OFFSET = NORMAL_OFFSET + NORM_SIZE * sizeof(float); 
 
 		private readonly List<int> indices = new List<int>();
 
@@ -37,7 +39,6 @@ namespace MiddleGames.Engine
 		private readonly List<Vector3> normals         = new List<Vector3>();
 		private readonly List<Vertex>  modelData       = new List<Vertex>();
 
-		private int iboId;
 		private int vaoId;
 		private int vboId;
 
@@ -71,7 +72,7 @@ namespace MiddleGames.Engine
 						numNormals++;
 						break;
 					case "vt":
-						textureVertices.Add(new Vector2(float.Parse(tokens[1]), float.Parse(tokens[2])));
+						textureVertices.Add(new Vector2(Convert.ToSingle(tokens[1]), Convert.ToSingle(tokens[2])));
 						break;
 					case "f":
 						string[] point0 = tokens[1].Split('/');
@@ -80,26 +81,26 @@ namespace MiddleGames.Engine
 
 						Face face = new ()
 						{
-							v1  = Convert.ToInt32(point0[0]) - 1,
+							vp1  = Convert.ToInt32(point0[0]) - 1,
 							uv1 = Convert.ToInt32(point0[1]) - 1,
 							vn1 = Convert.ToInt32(point0[2]) - 1,
 							 
-							v2  = Convert.ToInt32(point1[0]) - 1,
+							vp2  = Convert.ToInt32(point1[0]) - 1,
 							uv2 = Convert.ToInt32(point0[1]) - 1,
 							vn2 = Convert.ToInt32(point1[2]) - 1,
 
-							v3  = Convert.ToInt32(point2[0]) - 1,
+							vp3  = Convert.ToInt32(point2[0]) - 1,
 							uv3 = Convert.ToInt32(point0[1]) - 1,
 							vn3 = Convert.ToInt32(point2[2]) - 1
 						};
 
-						modelData.Add(new Vertex() { norm = normals[face.vn1], pos = vertices[face.v1] });
-						modelData.Add(new Vertex() { norm = normals[face.vn2], pos = vertices[face.v2] });
-						modelData.Add(new Vertex() { norm = normals[face.vn3], pos = vertices[face.v3] });
+						modelData.Add(new Vertex() { norm = normals[face.vn1], pos = vertices[face.vp1], TexCoord = textureVertices[face.uv1]});
+						modelData.Add(new Vertex() { norm = normals[face.vn2], pos = vertices[face.vp2], TexCoord = textureVertices[face.uv2]});
+						modelData.Add(new Vertex() { norm = normals[face.vn3], pos = vertices[face.vp3], TexCoord = textureVertices[face.uv3]});
 
-						indices.Add(face.v1);
-						indices.Add(face.v2);
-						indices.Add(face.v3);
+						indices.Add(face.vp1);
+						indices.Add(face.vp2);
+						indices.Add(face.vp3);
 
 						numFaces += 3;
 
@@ -107,7 +108,7 @@ namespace MiddleGames.Engine
 				}
 			}
 
-			loadVbo();
+			LoadVbo();
 
 			Console.Write("done\n");
 
@@ -116,17 +117,21 @@ namespace MiddleGames.Engine
 			Console.WriteLine("numFaces" + numFaces);
 		}
 
-		private void loadVbo()
+		private void LoadVbo()
 		{
-			// Vertex index data
-			GL.GenBuffers(1, out iboId);
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboId);
+			// VAO
+			GL.GenVertexArrays(1, out vaoId);
+			GL.BindVertexArray(vaoId);
+
+			// Create and upload indices buffer
+			GL.GenBuffers(1, out int ebo);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(int) * indices.Count), indices.ToArray(), BufferUsageHint.StaticDraw);
 
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboId);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
 			Console.WriteLine(GL.GetError());
 
-			// Vertex position data
+			// Allocate space for vertexes
 			GL.GenBuffers(1, out vboId);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
 			GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Marshal.SizeOf(default(Vertex)) * modelData.Count), modelData.ToArray(), BufferUsageHint.StaticDraw);
@@ -134,20 +139,20 @@ namespace MiddleGames.Engine
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
 			Console.WriteLine(GL.GetError());
 
-			// VAO
-			GL.GenVertexArrays(1, out vaoId);
-			GL.BindVertexArray(vaoId);
+			const int LAYOUT_MAX_INDEX = POS_SIZE + NORM_SIZE + TEXCOORD_SIZE * sizeof(float); // VERTEX_SIZE_BYTES in largo engine
 
-			const int LAYOUT_MAX_INDEX = 5 * sizeof(float); // VERTEX_SIZE_BYTES in largo engine
-			
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
+			// Enable the buffer attribute pointers
 			GL.VertexAttribPointer(0, POS_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, POS_OFFSET);          // layout 0
-			GL.VertexAttribPointer(1, TexCoord_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, TexCoord_OFFSET);// layout 1
+			GL.EnableVertexAttribArray(0);
 
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboId);
+			GL.VertexAttribPointer(1, NORM_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, NORMAL_OFFSET);      // layout 1
+			GL.EnableVertexAttribArray(1);
 
+			GL.VertexAttribPointer(2, TEXCOORD_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, TEXCOORD_OFFSET);// layout 2
+			GL.EnableVertexAttribArray(2);
+
+			// rebind
 			GL.BindVertexArray(0);
-
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 		}
@@ -157,14 +162,15 @@ namespace MiddleGames.Engine
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
 			GL.BindVertexArray(vaoId);
 
-			GL.EnableVertexAttribArray(0); // position Layout
-			GL.EnableVertexAttribArray(1); // TexCoord Layout
+			GL.EnableVertexAttribArray(0); // position in
+			GL.EnableVertexAttribArray(1); // normal   in
+			GL.EnableVertexAttribArray(2); // TexCoord in
 
 			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt,indices.ToArray());
-			GL.DrawElements(PrimitiveType.Triangles, vertices.Count, DrawElementsType.UnsignedInt,vertices.ToArray());
 
 			GL.DisableVertexAttribArray(0);
 			GL.DisableVertexAttribArray(1);
+			GL.DisableVertexAttribArray(2);
 
 			GL.BindVertexArray(0);
 		}

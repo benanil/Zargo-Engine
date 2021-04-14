@@ -8,8 +8,8 @@ namespace ZargoEngine.Engine
 {
     public static class AssetManager
     {
-        private static readonly Dictionary<string,Shader > Shaders  = new Dictionary<string,Shader>();
-        private static readonly Dictionary<string,Texture> Textures = new Dictionary<string,Texture>();
+        private static readonly Dictionary<string, Shader > Shaders  = new();
+        private static readonly Dictionary<string, Texture> Textures = new();
 
         public static Shader GetShader(string vertexPath, string fragmentPath)
         {
@@ -21,7 +21,7 @@ namespace ZargoEngine.Engine
             return shader;
         }
 
-        public static Texture GetTexture(string path,TextureUnit textureUnit)
+        public static Texture GetTexture(string path, TextureUnit textureUnit)
         {
             if (Textures.ContainsKey(path)){
                 if (Textures[path].TexCoord == textureUnit){ // look they have same coord 
@@ -36,18 +36,12 @@ namespace ZargoEngine.Engine
 
         public static void DisposeAllShaders()
         {
-            foreach (var shaderPair in Shaders)
-            {
-                shaderPair.Value.Dispose();
-            }
+            foreach (var shaderPair in Shaders)  shaderPair.Value.Dispose();
         }
 
         public static void DisposeAllTextures()
         {
-            foreach (var texturePair in Textures)
-            {
-                texturePair.Value.Dispose();
-            }
+            foreach (var texturePair in Textures) texturePair.Value.Dispose();
         }
     }
 }

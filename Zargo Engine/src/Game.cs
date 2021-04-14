@@ -40,13 +40,13 @@ namespace MiddleGames
             CursorGrabbed = true;
 
             Time.Start();
-
-            var shader = new Shader("../../Assets/Shaders/BasicVert.hlsl", "../../Assets/Shaders/BasicFrag.hlsl");
-            var firstMesh = new Mesh("../../Assets/cube.obj");
-            var texture = new Texture("../../Assets/Images/wood_img.jpg");
-            var camera = new Camera(new Vector3(-2,1,0), Size.X, Size.Y);
-
+            var camera    = new Camera(new Vector3(-2,1,0), Size.X, Size.Y);
             Scene scene = new(camera,"first Scene");
+            SceneManager.AddScene(scene);
+
+            var shader    = AssetManager.GetShader("Shaders/BasicVert.hlsl", "Shaders/BasicFrag.hlsl");
+            var texture   = AssetManager.GetTexture("Images/wood_img.jpg", OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+            var firstMesh = AssetManager.LoadMesh("Models/cube.obj");
 
             // create cubes
             for (int x = 0; x < 10; x++){
@@ -59,7 +59,6 @@ namespace MiddleGames
                 }
             }
 
-            SceneManager.AddScene(scene);
             SceneManager.LoadScene(0); // starts first scene 
 
             GL.ClearColor(.2f, .3f, .4f, 1);

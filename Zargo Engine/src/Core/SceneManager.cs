@@ -8,10 +8,27 @@ namespace ZargoEngine
     public static class SceneManager
     {
         public static List<Scene> scenes = new List<Scene>();
-        public static Scene currentScene;
+
+        private static Scene _currentScene;
+        public static Scene currentScene
+        {
+            get
+            {
+                if (_currentScene == null){
+                    _currentScene = scenes[0];
+                }
+                return _currentScene;
+            }
+            set
+            {
+                _currentScene = value;
+            }
+        }
 
         public static void AddScene(Scene scene){
-            scenes.Add(scene);
+            if (!scenes.Contains(scene)){
+                scenes.Add(scene);
+            }
         }
 
         public static void LoadScene(int index){

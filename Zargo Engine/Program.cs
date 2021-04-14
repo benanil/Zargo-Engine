@@ -8,6 +8,7 @@ namespace ZargoEngine
     {
         static void Main(string[] args)
         {
+	    
             GameWindowSettings gameWindowSettings = new GameWindowSettings()
             {
                 IsMultiThreaded = true,
@@ -22,6 +23,7 @@ namespace ZargoEngine
 
             using Game game = new(gameWindowSettings, nativeWindowSettings);
             game.Run();
+	    
         }
     }
 }

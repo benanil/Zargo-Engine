@@ -12,7 +12,6 @@ namespace ZargoEngine
             GameWindowSettings gameWindowSettings = new GameWindowSettings()
             {
                 IsMultiThreaded = true,
-                UpdateFrequency = 1 / 60,
             };
 
             NativeWindowSettings nativeWindowSettings = new NativeWindowSettings()

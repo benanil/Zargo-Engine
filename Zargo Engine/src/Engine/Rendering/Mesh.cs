@@ -14,15 +14,15 @@ namespace MiddleGames.Engine
 		public Vector2 TexCoord;
     }
 
-    struct Face
-    {
-        public int vp1, vp2, vp3;    // vertex indices
-		public int uv1, uv2, uv3; // uv indices
-		public int vn1, vn2, vn3; // normal indices
-    }
 
     public class Mesh
 	{
+ 		private struct Face
+		{
+			public int vp1, vp2, vp3;  // vertex indices
+			public int uv1, uv2, uv3; // uv indices
+			public int vn1, vn2, vn3; // normal indices
+		}
 
 		private const int POS_SIZE = 3;
 		private const int NORM_SIZE = 3;
@@ -44,9 +44,7 @@ namespace MiddleGames.Engine
 
 		public Mesh(string filename)
 		{
-			int numVertices = 0;
-			int numNormals = 0;
-			int numFaces = 0;
+			int numTriangle = 0;
 
 			Console.Write("Loading model '" + filename + "'... ");
 
@@ -65,11 +63,9 @@ namespace MiddleGames.Engine
 				{
 					case "v":
 						vertices.Add(new Vector3(Convert.ToSingle(tokens[1]), Convert.ToSingle(tokens[2]), Convert.ToSingle(tokens[3])));
-						numVertices++;
 						break;
 					case "vn":
 						normals.Add(new Vector3(Convert.ToSingle(tokens[1]), Convert.ToSingle(tokens[2]), Convert.ToSingle(tokens[3])));
-						numNormals++;
 						break;
 					case "vt":
 						textureVertices.Add(new Vector2(Convert.ToSingle(tokens[1]), Convert.ToSingle(tokens[2])));
@@ -102,19 +98,19 @@ namespace MiddleGames.Engine
 						indices.Add(face.vp2);
 						indices.Add(face.vp3);
 
-						numFaces += 3;
+						numTriangle += 1;
 
 						break;
 				}
 			}
 
-			LoadVbo();
-
 			Console.Write("done\n");
 
-			Console.WriteLine("numVertices" + numVertices);
-			Console.WriteLine("numNormals" + numNormals);
-			Console.WriteLine("numFaces" + numFaces);
+			Console.WriteLine("numVertices" + vertices.Count);
+			Console.WriteLine("numNormals " + normals.Count);
+			Console.WriteLine("numFaces   " + numTriangle);
+			Console.WriteLine("indices    " + indices.Count);
+			LoadVbo();
 		}
 
 		private void LoadVbo()
@@ -151,7 +147,7 @@ namespace MiddleGames.Engine
 			GL.VertexAttribPointer(2, TEXCOORD_SIZE, VertexAttribPointerType.Float, false, LAYOUT_MAX_INDEX, TEXCOORD_OFFSET);// layout 2
 			GL.EnableVertexAttribArray(2);
 
-			// rebind
+			// unbind
 			GL.BindVertexArray(0);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
@@ -172,7 +168,9 @@ namespace MiddleGames.Engine
 			GL.DisableVertexAttribArray(1);
 			GL.DisableVertexAttribArray(2);
 
+			// unbind
 			GL.BindVertexArray(0);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 		}
 	}
 }

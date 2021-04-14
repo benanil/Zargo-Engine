@@ -23,8 +23,8 @@ namespace ZargoEngine.Rendering
 
         public void Render(Camera camera)
         {
-            texture.Bind();
             shader.Use();
+            texture.Bind();
 
             shader.SetMatrix4("model",gameObject.transform.Translation);
             shader.SetMatrix4("view", camera.GetViewMatrix());

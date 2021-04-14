@@ -21,7 +21,7 @@ namespace MiddleGames.Engine.Rendering
         private float _yaw = -MathHelper.PiOver2; // Without this you would be started rotated 90 degrees right
 
         // The field of view of the camera (radians)
-        private float _fov = (float)Math.PI / 2;
+        private float _fov = (float)Math.PI / 4; // 90 degrees
 
         public int ScreenWidth, ScreenHeight;
 

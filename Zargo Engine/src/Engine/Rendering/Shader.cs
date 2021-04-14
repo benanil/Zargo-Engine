@@ -33,6 +33,8 @@ namespace MiddleGames.Engine.Rendering
             if (isCompiled == 0){
                 GL.GetShaderInfoLog(vertexShader, out string info);
                 Console.WriteLine("failed to compile vertex shader: " + info);
+                Game.instance.Close();
+                return;
             }
 
             // create Fragment shader
@@ -45,6 +47,8 @@ namespace MiddleGames.Engine.Rendering
             if (isCompiled == 0){
                 GL.GetShaderInfoLog(vertexShader, out string info);
                 Console.WriteLine("failed to compile vertex shader: " + info);
+                Game.instance.Close();
+                return;
             }
 
             // link Shaders

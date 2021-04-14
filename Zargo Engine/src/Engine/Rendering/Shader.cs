@@ -8,7 +8,7 @@ namespace MiddleGames.Engine.Rendering
 {
     public class Shader : IDisposable
     {
-        private readonly int program; // tutorialda handle deniyor
+        public readonly int program; // tutorialda handle deniyor
 
         public Shader(string vertexPath, string fragmentPath)
         {
@@ -79,25 +79,25 @@ namespace MiddleGames.Engine.Rendering
         public int GetAttribLocation(string name) => GL.GetAttribLocation(program, name);
 
         // property to id
-        public static int PoropertyToId(int program, string name) => GL.GetUniformLocation(program, name);
-        public int        PoropertyToId(string name)              => GL.GetUniformLocation(program, name);
+        public static int PoropertyToId(in int program, string name) => GL.GetUniformLocation(program, name);
+        public int        PoropertyToId(in string name)              => GL.GetUniformLocation(program, name);
 
         // Uniforms
-        public static void SetInt    (int location, int     value) => GL.Uniform1(location, value);
-        public static void SetFloat  (int location, float   value) => GL.Uniform1(location, value);
-        public static void SetVector2(int location, Vector2 value) => GL.Uniform2(location, value);
-        public static void SetVector3(int location, Vector3 value) => GL.Uniform3(location, value);
-        public static void SetVector4(int location, Vector4 value) => GL.Uniform4(location, value);
-        public static void SetColor  (int location, Color4  value) => GL.Uniform4(location, value);
-        public static void SetMatrix4(int location, Matrix4 value) => GL.UniformMatrix4(location, true, ref value);
-
-        public void SetInt    (string name, int     value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
-        public void SetFloat  (string name, float   value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
-        public void SetVector2(string name, Vector2 value)  => GL.Uniform2(GL.GetUniformLocation(program, name), value);
-        public void SetVector3(string name, Vector3 value)  => GL.Uniform3(GL.GetUniformLocation(program, name), value);
-        public void SetVector4(string name, Vector4 value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
-        public void SetColor  (string name, Color4  value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
-        public void SetMatrix4(string name, Matrix4 value)  => GL.UniformMatrix4(GL.GetUniformLocation(program, name), true, ref value);
+        public static void SetInt    (in int location, in int     value) => GL.Uniform1(location, value);
+        public static void SetFloat  (in int location, in float   value) => GL.Uniform1(location, value);
+        public static void SetColor  (in int location, in Color4  value) => GL.Uniform4(location, value);
+        public static void SetVector2(in int location, in Vector2 value) => GL.Uniform2(location, value);
+        public static void SetVector3(in int location, in Vector3 value) => GL.Uniform3(location, value);
+        public static void SetVector4(in int location, in Vector4 value) => GL.Uniform4(location, value);
+        public static void SetMatrix4(in int location, Matrix4 value) => GL.UniformMatrix4(location, true, ref value);
+        
+        public void SetInt    (in string name, in int     value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
+        public void SetFloat  (in string name, in float   value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
+        public void SetColor  (in string name, in Color4  value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
+        public void SetVector2(in string name, in Vector2 value)  => GL.Uniform2(GL.GetUniformLocation(program, name), value);
+        public void SetVector3(in string name, in Vector3 value)  => GL.Uniform3(GL.GetUniformLocation(program, name), value);
+        public void SetVector4(in string name, in Vector4 value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
+        public void SetMatrix4(in string name, Matrix4 value)  => GL.UniformMatrix4(GL.GetUniformLocation(program, name), true, ref value);
 
         // disposing
 

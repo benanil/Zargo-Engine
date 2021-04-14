@@ -33,7 +33,20 @@ namespace MiddleGames.Engine.Rendering
         }
 
         // The position of the camera
-        public Vector3 Position { get; set; }
+        private Vector3 _position;
+        public Vector3 Position 
+        {
+            get => _position;
+            set
+            {
+                if (value != _position){
+                    Console.WriteLine("camera position" + value);
+                }
+                _position = value;
+
+            }
+            
+        }
 
         // This is simply the aspect ratio of the viewport, used for the projection matrix
         public float AspectRatio => ScreenWidth / ScreenHeight;
@@ -50,6 +63,7 @@ namespace MiddleGames.Engine.Rendering
                 var angle = MathHelper.Clamp(value, -89f, 89f);
                 _pitch = MathHelper.DegreesToRadians(angle);
                 UpdateVectors();
+                Console.WriteLine("pitch: " + _pitch);
             }
         }
 
@@ -61,6 +75,7 @@ namespace MiddleGames.Engine.Rendering
             {
                 _yaw = MathHelper.DegreesToRadians(value);
                 UpdateVectors();
+                Console.WriteLine("yaw: " + _yaw);
             }
         }
 

@@ -8,12 +8,16 @@ using System.Runtime.InteropServices;
 
 namespace MiddleGames.Engine
 {
+	[StructLayout(LayoutKind.Explicit)]
     public struct Vertex
     {
-		public Vector3 pos, norm;
-		public Vector2 TexCoord;
+		[FieldOffset(0)]
+		public Vector3 aPosition;
+		[FieldOffset(1)]
+		public Vector3 aNormal;
+		[FieldOffset(2)]
+		public Vector2 aTexCoord;
     }
-
 
     public class Mesh
 	{
@@ -39,6 +43,7 @@ namespace MiddleGames.Engine
 		private readonly List<Vector3> normals         = new List<Vector3>();
 		private readonly List<Vertex>  modelData       = new List<Vertex>();
 
+		private int eboID;
 		private int vaoId;
 		private int vboId;
 
@@ -69,6 +74,7 @@ namespace MiddleGames.Engine
 						break;
 					case "vt":
 						textureVertices.Add(new Vector2(Convert.ToSingle(tokens[1]), Convert.ToSingle(tokens[2])));
+			
 						break;
 					case "f":
 						string[] point0 = tokens[1].Split('/');
@@ -82,17 +88,17 @@ namespace MiddleGames.Engine
 							vn1 = Convert.ToInt32(point0[2]) - 1,
 							 
 							vp2  = Convert.ToInt32(point1[0]) - 1,
-							uv2 = Convert.ToInt32(point0[1]) - 1,
+							uv2 = Convert.ToInt32(point1[1]) - 1,
 							vn2 = Convert.ToInt32(point1[2]) - 1,
 
 							vp3  = Convert.ToInt32(point2[0]) - 1,
-							uv3 = Convert.ToInt32(point0[1]) - 1,
+							uv3 = Convert.ToInt32(point2[1]) - 1,
 							vn3 = Convert.ToInt32(point2[2]) - 1
 						};
 
-						modelData.Add(new Vertex() { norm = normals[face.vn1], pos = vertices[face.vp1], TexCoord = textureVertices[face.uv1]});
-						modelData.Add(new Vertex() { norm = normals[face.vn2], pos = vertices[face.vp2], TexCoord = textureVertices[face.uv2]});
-						modelData.Add(new Vertex() { norm = normals[face.vn3], pos = vertices[face.vp3], TexCoord = textureVertices[face.uv3]});
+						modelData.Add(new Vertex() { aNormal = normals[face.vn1], aPosition = vertices[face.vp1], aTexCoord = textureVertices[face.uv1]});
+						modelData.Add(new Vertex() { aNormal = normals[face.vn2], aPosition = vertices[face.vp2], aTexCoord = textureVertices[face.uv2]});
+						modelData.Add(new Vertex() { aNormal = normals[face.vn3], aPosition = vertices[face.vp3], aTexCoord = textureVertices[face.uv3]});
 
 						indices.Add(face.vp1);
 						indices.Add(face.vp2);
@@ -106,11 +112,54 @@ namespace MiddleGames.Engine
 
 			Console.Write("done\n");
 
-			Console.WriteLine("numVertices" + vertices.Count);
-			Console.WriteLine("numNormals " + normals.Count);
-			Console.WriteLine("numFaces   " + numTriangle);
-			Console.WriteLine("indices    " + indices.Count);
 			LoadVbo();
+			DebugMesh();
+		}
+
+		public void DebugMesh()
+		{
+			Console.Write("Vertices\n");
+			Console.Write("------------------\n");
+			for (int i = 0; i < vertices.Count; i++)
+			{
+				Console.WriteLine(vertices[i]);
+			}
+
+			Console.Write("normals\n");
+			Console.Write("------------------\n");
+			for (int i = 0; i < normals.Count; i++)
+			{
+				Console.WriteLine(normals[i]);
+			}
+
+			Console.Write("indices\n");
+			Console.Write("------------------\n");
+			for (int i = 0; i < indices.Count; i++)
+			{
+				int queue = 0;
+				if (i != 0)
+					queue = i % 3;
+
+				if (queue == 0)
+				{
+					Console.Write("\n");
+				}
+				Console.Write(indices[i].ToString() + " ");
+			}
+			Console.Write("\n");
+
+			Console.Write("texture vertices\n");
+			Console.Write("------------------\n");
+			for (int i = 0; i < textureVertices.Count; i++)
+			{
+				Console.WriteLine(textureVertices[i].ToString() );
+			}
+		}
+
+		// Loops the value t, so that it is never larger than length and never smaller than 0.
+		public static float Repeat(float t, float length)
+		{
+			return Math.Clamp(t - MathF.Floor(t / length) * length, 0.0f, length);
 		}
 
 		private void LoadVbo()
@@ -118,13 +167,14 @@ namespace MiddleGames.Engine
 			// VAO
 			GL.GenVertexArrays(1, out vaoId);
 			GL.BindVertexArray(vaoId);
+			Console.WriteLine(GL.GetError());
 
 			// Create and upload indices buffer
-			GL.GenBuffers(1, out int ebo);
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+			GL.GenBuffers(1, out eboID);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, eboID);
 			GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(int) * indices.Count), indices.ToArray(), BufferUsageHint.StaticDraw);
 
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, eboID);
 			Console.WriteLine(GL.GetError());
 
 			// Allocate space for vertexes
@@ -156,13 +206,14 @@ namespace MiddleGames.Engine
 		public void Draw()
 		{
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboId);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, eboID);
 			GL.BindVertexArray(vaoId);
 
 			GL.EnableVertexAttribArray(0); // position in
 			GL.EnableVertexAttribArray(1); // normal   in
 			GL.EnableVertexAttribArray(2); // TexCoord in
 
-			GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt,indices.ToArray());
+			//GL.DrawElements(PrimitiveType.Triangles,indices.Count, DrawElementsType.UnsignedInt,indices.ToArray());
 
 			GL.DisableVertexAttribArray(0);
 			GL.DisableVertexAttribArray(1);
@@ -171,6 +222,7 @@ namespace MiddleGames.Engine
 			// unbind
 			GL.BindVertexArray(0);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 		}
 	}
 }

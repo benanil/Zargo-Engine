@@ -10,17 +10,25 @@ namespace ZargoEngine
         {
             get
             {
-                return Matrix4.CreateTranslation(position);       
+                return Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(position);
             }
         }
 
         public Vector3 position;
         public Quaternion rotation;
+        public float scale = 2;
 
         public Transform(Vector3 position, Quaternion rotation)
         {
             this.position = position;
             this.rotation = rotation; // arono
+        }
+
+        public Transform(Vector3 position, Quaternion rotation,float scale)
+        {
+            this.position = position;
+            this.rotation = rotation; // arono
+            this.scale = scale;
         }
 
         public Transform()

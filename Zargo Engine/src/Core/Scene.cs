@@ -16,14 +16,12 @@ namespace ZargoEngine
         private List<GameObject> gameObjects = new();
         private List<MeshRenderer> meshRenderers = new();
         
-        private Vector2 lastPos;
-
         private bool started;
         
         float deltaX,deltaY;
 
-        private const float cameraSens = 10;
-        private const float cameraMoveSpeed = 10f;
+        private const float cameraSens = 20;
+        private const float cameraMoveSpeed = .2f;
 
         private float currentCameraSpeed;
 
@@ -40,8 +38,8 @@ namespace ZargoEngine
         public void Start() {
             started = true;
 
-            var mousePos = Game.instance.MousePosition;
-            lastPos = new Vector2(mousePos.X, mousePos.Y);
+            //var mousePos = Game.instance.MousePosition;
+            //lastPos = new Vector2(mousePos.X, mousePos.Y);
 
             for (int i = 0; i < gameObjects.Count; i++) {
                 gameObjects[i].Start();
@@ -52,7 +50,6 @@ namespace ZargoEngine
         {
             if (!started)
                 return;
-
             for (int i = 0; i < meshRenderers.Count; i++) {
                 meshRenderers[i].Render(camera);
             }
@@ -71,28 +68,29 @@ namespace ZargoEngine
 
         private void Input()
         {
-            Vector2 mousePos = Game.instance.MousePosition;
+            //Vector2 mousePos = Game.instance.MousePosition;
+            //
+            //deltaX = mousePos.X - lastPos.X;
+            //deltaY = mousePos.Y - lastPos.Y;
+            //lastPos = new Vector2(mousePos.X, mousePos.Y);
+            //
+            //camera.Pitch = MathHelper.Clamp((float)(camera.Pitch - deltaX * cameraSens * Time.DeltaTime), -89, 89);
+            //camera.Yaw   = MathHelper.Clamp((float)(camera.Yaw - deltaY * cameraSens * Time.DeltaTime), -89, 89);
 
-            deltaX = mousePos.X - lastPos.X;
-            deltaY = mousePos.Y - lastPos.Y;
-            lastPos = new Vector2(mousePos.X, mousePos.Y);
-            
-            if (camera.Pitch > 89.0f)       camera.Pitch = 89.0f;
-            else if (camera.Pitch < -89.0f) camera.Pitch = -89.0f;
-            else                            camera.Pitch -= deltaX * cameraSens;
+            deltaX = Game.instance.IsKeyDown(Keys.KeyPad6) ? 1 : Game.instance.IsKeyDown(Keys.KeyPad4) ? -1 : 0;
+            deltaY = Game.instance.IsKeyDown(Keys.KeyPad8) ? 1 : Game.instance.IsKeyDown(Keys.KeyPad5) ? -1 : 0;
 
-            if (camera.Yaw > 89.0f)         camera.Yaw = 89.0f;
-            else if (camera.Yaw < -89.0f)   camera.Yaw = -89.0f;
-            else                            camera.Yaw -= deltaY * cameraSens;
+            if (deltaX != 0) camera.Pitch = MathHelper.Clamp((float)(camera.Pitch - deltaX * cameraSens * Time.DeltaTime), -89, 89);
+            if (deltaY != 0) camera.Yaw   = MathHelper.Clamp((float)(camera.Yaw - deltaY * cameraSens   * Time.DeltaTime), -89, 89);
 
             currentCameraSpeed = Game.instance.IsKeyDown(Keys.LeftShift) ? cameraMoveSpeed * 2 : cameraMoveSpeed;
             
-            if (Game.instance.IsKeyDown(Keys.W)) camera.Position += camera.Front * currentCameraSpeed; //Forward 
-            if (Game.instance.IsKeyDown(Keys.S)) camera.Position -= camera.Front * currentCameraSpeed; //Backwards
-            if (Game.instance.IsKeyDown(Keys.A)) camera.Position -= Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Left
-            if (Game.instance.IsKeyDown(Keys.D)) camera.Position += Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Right
-            if (Game.instance.IsKeyDown(Keys.E)) camera.Position += camera.Up * currentCameraSpeed; //Up 
-            if (Game.instance.IsKeyDown(Keys.Q)) camera.Position -= camera.Up * currentCameraSpeed; //Down
+            if (Game.instance.IsKeyReleased(Keys.W)) camera.Position += camera.Front * currentCameraSpeed; //Forward 
+            if (Game.instance.IsKeyReleased(Keys.S)) camera.Position -= camera.Front * currentCameraSpeed; //Backwards
+            if (Game.instance.IsKeyReleased(Keys.A)) camera.Position -= Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Left
+            if (Game.instance.IsKeyReleased(Keys.D)) camera.Position += Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Right
+            if (Game.instance.IsKeyReleased(Keys.E)) camera.Position += camera.Up * currentCameraSpeed; //Up 
+            if (Game.instance.IsKeyReleased(Keys.Q)) camera.Position -= camera.Up * currentCameraSpeed; //Down
         }
 
         public void Stop(){

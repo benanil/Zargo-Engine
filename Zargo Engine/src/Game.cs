@@ -1,5 +1,4 @@
 ﻿
-using MiddleGames.Engine;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
@@ -9,6 +8,7 @@ using ZargoEngine;
 using ZargoEngine.Rendering;
 using ZargoEngine.Engine;
 using OpenTK.Mathematics;
+using System;
 
 namespace MiddleGames
 {
@@ -48,11 +48,14 @@ namespace MiddleGames
             var texture   = AssetManager.GetTexture("Images/wood_img.jpg", OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
             var firstMesh = AssetManager.LoadMesh("Models/cube.obj");
 
+            Console.WriteLine("GameObject Transforms");
+            Console.WriteLine("---------------------");
             // create cubes
             for (int x = 0; x < 10; x++){
                 for (int y = 0; y < 10; y++){
                     for (int z = 0; z < 10; z++){
                         var go = new GameObject("go" + x + y + z, new Transform(new Vector3(x,y,z), Quaternion.Identity));
+                        Console.WriteLine(go.transform.position);
                         scene.AddGameObject(go);
                         scene.AddMeshRenderer(new MeshRenderer(go, shader, firstMesh, texture));
                     }

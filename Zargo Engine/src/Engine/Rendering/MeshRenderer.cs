@@ -7,6 +7,10 @@ namespace ZargoEngine.Rendering
 {
     public class MeshRenderer : Component
     {
+        private readonly int modelID;
+        private readonly int viewID;
+        private readonly int projectionID;
+
         public Shader shader;
         public Mesh mesh;
         public Texture texture;
@@ -18,6 +22,10 @@ namespace ZargoEngine.Rendering
             this.mesh = mesh;
             this.texture = texture;
 
+            modelID      = Shader.PoropertyToId(shader.program, "model");
+            viewID       = Shader.PoropertyToId(shader.program, "view");
+            projectionID = Shader.PoropertyToId(shader.program, "projection");
+
             SceneManager.currentScene.AddMeshRenderer(this);
         }
 
@@ -26,9 +34,9 @@ namespace ZargoEngine.Rendering
             shader.Use();
             texture.Bind();
 
-            shader.SetMatrix4("model",gameObject.transform.Translation);
-            shader.SetMatrix4("view", camera.GetViewMatrix());
-            shader.SetMatrix4("projection", camera.GetProjectionMatrix());
+            Shader.SetMatrix4(modelID     , gameObject.transform.Translation);
+            Shader.SetMatrix4(viewID      , camera.GetViewMatrix());
+            Shader.SetMatrix4(projectionID, camera.GetProjectionMatrix());
             
             mesh.Draw();
 

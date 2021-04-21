@@ -12,7 +12,7 @@ namespace ZargoEngine
         public static Vector2 MouseAxis{
             get{
                 mouseAxis = Vector2.Normalize(MousePosition() - mouseOld);
-                mouseOld = mouseAxis;
+                mouseOld = MousePosition();
                 return mouseAxis;        
             }
         }

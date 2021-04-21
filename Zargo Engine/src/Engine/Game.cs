@@ -5,8 +5,8 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Collections.Generic;
 using ZargoEngine.AssetManagement;
-using ZargoEngine.Core;
 using ZargoEngine.Rendering;
 
 namespace ZargoEngine
@@ -28,15 +28,21 @@ namespace ZargoEngine
             Camera camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");
 
-            var mesh    = MeshCreator.CreateCube();
+            var mesh = AssetManager.GetMesh("Models/cube.obj");
+            //var mesh    = MeshCreator.CreateCube();
             var shader  = AssetManager.GetShader("Shaders/BasicVert.hlsl", "Shaders/BasicFrag.hlsl");
             var texture = AssetManager.GetTexture("Images/wood_img.jpg");
 
-            var transform = new Transform(new Vector3(0, 0, 0));
+            const float distanceBetweenCubes = 5f;
 
-            scene.AddMeshRenderer(new MeshRenderer(mesh, shader, ref transform, ref texture));
+            for (int x = 0; x < 10; x++)
+                for (int y = 0; y < 10; y++)
+                    for (int z = 0; z < 10; z++)
+                        scene.AddMeshRenderer(new MeshRenderer(mesh, shader, new Transform(new Vector3(x * distanceBetweenCubes, y * distanceBetweenCubes, z * distanceBetweenCubes)), ref texture));
+
             SceneManager.AddScene(scene);
             SceneManager.LoadScene(0);
+            GL.Enable(EnableCap.DepthTest);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -46,6 +52,7 @@ namespace ZargoEngine
 
             SceneManager.currentScene?.Render();
 
+            GL.Flush();
             SwapBuffers();
             base.OnRenderFrame(args);
         }
@@ -68,6 +75,7 @@ namespace ZargoEngine
 
         private void Input()
         {
+            CursorVisible = !IsMouseButtonDown(MouseButton.Right);
             if (IsKeyReleased(Keys.Enter) || IsKeyReleased(Keys.KeyPadEnter)) LogGame();
             if (IsKeyPressed(Keys.Escape)) Close();
         }

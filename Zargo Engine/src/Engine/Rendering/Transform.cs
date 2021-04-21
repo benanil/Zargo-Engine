@@ -34,11 +34,11 @@ namespace ZargoEngine.Rendering
 
         public Matrix4 GetTranslation()
         {
-            return Matrix4.Transpose(Matrix4.CreateScale(scale)               *
-                   Matrix4.CreateTranslation(position)                        *
-                   Matrix4.CreateRotationX  (.2f) *
-                   Matrix4.CreateRotationY  (.1f) *
-                   Matrix4.CreateRotationZ  (0));
+            return Matrix4.Transpose(Matrix4.CreateScale(scale) *
+                   Matrix4.CreateTranslation(position)          *
+                   Matrix4.CreateRotationX  (eulerAngles.X)     *
+                   Matrix4.CreateRotationY  (eulerAngles.Y)     *
+                   Matrix4.CreateRotationZ  (eulerAngles.Z));
         }
     }
 }

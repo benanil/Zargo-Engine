@@ -65,7 +65,7 @@ namespace ZargoEngine
         }
 
         private Vector2 mouseOldPos;
-        private readonly float cameraRotateSpeed = 100f, cameraMoveSpeed = 3f;
+        private readonly float cameraRotateSpeed = 100, cameraMoveSpeed = 3f;
 
         public void LogGame()
         {
@@ -92,8 +92,7 @@ namespace ZargoEngine
             if (Input.GetKey(Keys.Q)) camera.Position -= camera.Up    * targetMoveSpeed * Time.DeltaTime;
             if (Input.GetKey(Keys.E)) camera.Position += camera.Up    * targetMoveSpeed * Time.DeltaTime;
 
-            if ((Input.MousePosition() - mouseOldPos).Length < 200)
-            {
+            if ((Input.MousePosition() - mouseOldPos).Length < 200){
                 Vector2 mouseDirection = Input.MousePosition() - mouseOldPos;
                 camera.Pitch -= mouseDirection.Y * Time.DeltaTime * cameraRotateSpeed;
                 camera.Yaw += mouseDirection.X * Time.DeltaTime * cameraRotateSpeed;

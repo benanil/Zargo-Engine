@@ -45,11 +45,9 @@ namespace ZargoEngine.AssetManagement
         {
             string realPath = AssetsPath + path;
 
-            if (instance.meshes.TryGetValue(realPath, out Mesh mesh)){
-                return mesh;
-            }
-
-            mesh = new Mesh(path);
+            if (instance.meshes.TryGetValue(path, out Mesh mesh)) return mesh;
+            
+            mesh = new Mesh(realPath);
 
             instance.meshes.Add(path, mesh);
 
@@ -58,9 +56,9 @@ namespace ZargoEngine.AssetManagement
 
         public void Dispose()
         {
-            foreach (var meshPair in meshes)      meshPair.Value.Dispose();
+            foreach (var meshPair    in meshes)      meshPair.Value.Dispose();
             foreach (var texturePair in textures) texturePair.Value.Dispose();
-            foreach (var shaderPair in shaders)   shaderPair.Value.Dispose();
+            foreach (var shaderPair  in shaders)   shaderPair.Value.Dispose();
             GC.SuppressFinalize(this);
         }
     }

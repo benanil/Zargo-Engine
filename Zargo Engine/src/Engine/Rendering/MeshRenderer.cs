@@ -15,7 +15,7 @@ namespace ZargoEngine.Rendering
 
         readonly Transform transform;
 
-        public MeshRenderer(Mesh mesh, Shader shader,ref Transform transform, ref Texture texture)
+        public MeshRenderer(Mesh mesh, Shader shader,Transform transform, ref Texture texture)
         {
             this.mesh = mesh;
             this.shader = shader;

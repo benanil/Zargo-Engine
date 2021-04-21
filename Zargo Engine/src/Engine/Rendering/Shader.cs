@@ -1,108 +1,150 @@
 ﻿
-using OpenTK.Graphics.ES30;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.IO;
 
-namespace MiddleGames.Engine.Rendering
+namespace ZargoEngine.Rendering
 {
     public class Shader : IDisposable
     {
-        public readonly int program; // tutorialda handle deniyor
+        private readonly int program;
 
         public Shader(string vertexPath, string fragmentPath)
         {
-            string vertexShaderSource;
-            string fragmentShaderSource;
+            string vertexSource = string.Empty;
+            string fragmentSource = string.Empty;
 
-            using (StreamReader reader = new(vertexPath)){ 
-                 vertexShaderSource = reader.ReadToEnd();
+            using (StreamReader reader = new StreamReader(vertexPath)){
+                vertexSource = reader.ReadToEnd();
             }
 
-            using (StreamReader reader = new(fragmentPath)){
-                fragmentShaderSource = reader.ReadToEnd();
+            using (StreamReader reader = new StreamReader(fragmentPath)){
+                fragmentSource = reader.ReadToEnd();
             }
 
-            // create vertex shader
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, vertexShaderSource);
-            GL.CompileShader(vertexShader);
-            GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int isCompiled);
-            
-            // check errors
-            if (isCompiled == 0){
-                GL.GetShaderInfoLog(vertexShader, out string info);
-                Console.WriteLine("failed to compile vertex shader: " + info);
-                Game.instance.Close();
+            int vertexID = GL.CreateShader(ShaderType.VertexShader);
+
+            GL.ShaderSource(vertexID, vertexSource);
+            GL.CompileShader(vertexID);
+            Console.WriteLine(GL.GetError());
+
+            GL.GetShader(vertexID, ShaderParameter.CompileStatus, out int log);
+
+            if (log == 0){
+                GL.GetShaderInfoLog(vertexID, out string infoLog);
+                Console.WriteLine(infoLog);
                 return;
             }
 
-            // create Fragment shader
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, vertexShaderSource);
-            GL.CompileShader(vertexShader);
-            GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out isCompiled);
+            int fragmentID = GL.CreateShader(ShaderType.FragmentShader);
 
-            // check errors
-            if (isCompiled == 0){
-                GL.GetShaderInfoLog(vertexShader, out string info);
-                Console.WriteLine("failed to compile vertex shader: " + info);
-                Game.instance.Close();
+            GL.ShaderSource(fragmentID, fragmentSource);
+            GL.CompileShader(fragmentID);
+
+            Console.WriteLine(GL.GetError());
+
+            GL.GetShader(vertexID, ShaderParameter.CompileStatus, out log);
+
+            if (log == 0){
+                GL.GetShaderInfoLog(fragmentID, out string infoLog);
+                Console.WriteLine(infoLog);
                 return;
             }
 
-            // link Shaders
             program = GL.CreateProgram();
-
-            GL.AttachShader(program, vertexShader);
-            GL.AttachShader(program, fragmentShader);
+            GL.AttachShader(program, vertexID);
+            GL.AttachShader(program, fragmentID);
 
             GL.LinkProgram(program);
 
-            Console.WriteLine("shader compiled sucsesfully");
+            Console.WriteLine(GL.GetError());
 
-            // clear memory
-            GL.DetachShader(program, vertexShader);
-            GL.DetachShader(program, fragmentShader);
-            GL.DeleteShader(fragmentShader);
-            GL.DeleteShader(vertexShader);
+            GL.GetShader(program,ShaderParameter.CompileStatus,out log);
+
+            if (log == 0){
+                GL.GetShaderInfoLog(program, out string infoLog);
+                Console.WriteLine(infoLog);
+                return;
+            }
+
+            Console.WriteLine("Shader compiled sucsesfully");
+
+            GL.DetachShader(program, vertexID);
+            GL.DetachShader(program, fragmentID);
+            GL.DeleteShader(vertexID);
+            GL.DeleteShader(fragmentID);
         }
 
-        public void Use(){
+        public void Use()
+        {
             GL.UseProgram(program);
         }
-
-        public static void Detach(){
+        
+        public static void DetachShader()
+        {
             GL.UseProgram(0);
         }
 
-        public int GetAttribLocation(string name) => GL.GetAttribLocation(program, name);
-
-        // property to id
-        public static int PoropertyToId(in int program, string name) => GL.GetUniformLocation(program, name);
-        public int        PoropertyToId(in string name)              => GL.GetUniformLocation(program, name);
+        public int GetAttribLocation(string name)
+        {
+            return GL.GetAttribLocation(program, name);
+        }
 
         // Uniforms
-        public static void SetInt    (in int location, in int     value) => GL.Uniform1(location, value);
-        public static void SetFloat  (in int location, in float   value) => GL.Uniform1(location, value);
-        public static void SetColor  (in int location, in Color4  value) => GL.Uniform4(location, value);
-        public static void SetVector2(in int location, in Vector2 value) => GL.Uniform2(location, value);
-        public static void SetVector3(in int location, in Vector3 value) => GL.Uniform3(location, value);
-        public static void SetVector4(in int location, in Vector4 value) => GL.Uniform4(location, value);
-        public static void SetMatrix4(in int location, Matrix4 value) => GL.UniformMatrix4(location, true, ref value);
+
+        public int GetUniformLocation( string name)
+        {
+            return GL.GetUniformLocation(program, name);
+        }
+
+        public static int GetUniformLocation(int program,string name)
+        {
+            return GL.GetUniformLocation(program, name);
+        }
+
+        public void SetInt    (string name, int value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform1(location, value);
+        }
+        public void SetFloat  (string name, float value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform1(location, value);
+        }
+        public void SetVector2(string name, Vector2 value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform2(location, value);
+        }
+        public void SetVector3(string name, Vector3 value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform3(location, value);
+        }
+        public void SetVector4(string name, Vector4 value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.Uniform4(location, value);
+        }
+        public void SetMatrix4(string name, Matrix4 value)
+        {
+            int location = GL.GetUniformLocation(program, name);
+            GL.UniformMatrix4(location, true, ref value);
+        }
         
-        public void SetInt    (in string name, in int     value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
-        public void SetFloat  (in string name, in float   value)  => GL.Uniform1(GL.GetUniformLocation(program, name), value);
-        public void SetColor  (in string name, in Color4  value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
-        public void SetVector2(in string name, in Vector2 value)  => GL.Uniform2(GL.GetUniformLocation(program, name), value);
-        public void SetVector3(in string name, in Vector3 value)  => GL.Uniform3(GL.GetUniformLocation(program, name), value);
-        public void SetVector4(in string name, in Vector4 value)  => GL.Uniform4(GL.GetUniformLocation(program, name), value);
-        public void SetMatrix4(in string name, Matrix4 value)  => GL.UniformMatrix4(GL.GetUniformLocation(program, name), true, ref value);
+        public static void SetInt(int location, int value)         => GL.Uniform1(location, value);
+        public static void SetFloat(int location, float value)     => GL.Uniform1(location, value);
+        public static void SetVector2(int location, Vector2 value) => GL.Uniform2(location, value);
+        public static void SetVector3(int location, Vector3 value) => GL.Uniform3(location, value);
+        public static void SetVector4(int location, Vector4 value) => GL.Uniform4(location, value);
 
-        // disposing
+        public static void SetMatrix4(int location, Matrix4 value, bool transpose = true) => GL.UniformMatrix4(location, transpose, ref value);
 
-        public void Dispose(){
-            GL.DeleteProgram(program);
+        public void Dispose()
+        {
+            GL.DeleteShader(program);
             GC.SuppressFinalize(this);
         }
     }

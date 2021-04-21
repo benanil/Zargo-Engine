@@ -1,18 +1,26 @@
 ﻿
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
 
 namespace ZargoEngine
 {
     public static class Time
     {
-        public static double DeltaTime;
-        public static Stopwatch stopwatch;
+        public static float DeltaTime;
+        public static float StartTime;
+        public static float time = (float)GLFW.GetTime();
+
+        public static float TimeSinceStartUp
+        {
+            get
+            {
+                return time - StartTime;
+            }
+        }
 
         public static void Start()
         {
-            stopwatch = new Stopwatch();
-            stopwatch.Start();
+            StartTime = (float)GLFW.GetTime();
         }
-
     }
 }

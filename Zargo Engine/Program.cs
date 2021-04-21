@@ -1,28 +1,19 @@
-﻿using MiddleGames;
+﻿
 using OpenTK.Windowing.Desktop;
-using OpenTK.Mathematics;
+using System;
 
 namespace ZargoEngine
 {
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static Game MainGame;
+
+        [STAThread]
+        private static void Main(string[] args)
         {
-	    
-            GameWindowSettings gameWindowSettings = new GameWindowSettings()
-            {
-                IsMultiThreaded = true,
-            };
-
-            NativeWindowSettings nativeWindowSettings = new NativeWindowSettings()
-            {
-                Title = "Zargo Engine",
-                Size = new Vector2i(800, 500),
-            };
-
-            using Game game = new(gameWindowSettings, nativeWindowSettings);
+            using Game game = new(GameWindowSettings.Default, NativeWindowSettings.Default);
+            MainGame = game;
             game.Run();
-	    
         }
     }
 }

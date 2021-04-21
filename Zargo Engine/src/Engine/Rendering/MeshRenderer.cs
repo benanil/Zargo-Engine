@@ -1,48 +1,53 @@
-﻿
-using MiddleGames.Engine;
-using MiddleGames.Engine.Rendering;
-using ZargoEngine.Core;
+﻿using System;
 
 namespace ZargoEngine.Rendering
 {
-    public class MeshRenderer : Component
+    public class MeshRenderer : IDisposable
     {
-        private readonly int modelID;
-        private readonly int viewID;
-        private readonly int projectionID;
+        private readonly int model;
+        private readonly int view;
+        private readonly int projection;
+        private const string texture0 = nameof(texture0);
 
         public Shader shader;
         public Mesh mesh;
         public Texture texture;
 
-        public MeshRenderer(GameObject gameObject, Shader shader, Mesh mesh, Texture texture) : base(gameObject)
+        readonly Transform transform;
+
+        public MeshRenderer(Mesh mesh, Shader shader,ref Transform transform, ref Texture texture)
         {
-            this.gameObject = gameObject;
-            this.shader = shader;
             this.mesh = mesh;
+            this.shader = shader;
+            this.transform = transform;
             this.texture = texture;
 
-            modelID      = Shader.PoropertyToId(shader.program, "model");
-            viewID       = Shader.PoropertyToId(shader.program, "view");
-            projectionID = Shader.PoropertyToId(shader.program, "projection");
-
-            SceneManager.currentScene.AddMeshRenderer(this);
+            projection = shader.GetUniformLocation("projection");
+            view       = shader.GetUniformLocation("view");
+            model      = shader.GetUniformLocation("model");
         }
 
-        public void Render(Camera camera)
+        public void Render(in Camera camera)
         {
             shader.Use();
+            shader.SetInt(texture0, 0);
             texture.Bind();
 
-            Shader.SetMatrix4(modelID     , gameObject.transform.Translation);
-            Shader.SetMatrix4(viewID      , camera.GetViewMatrix());
-            Shader.SetMatrix4(projectionID, camera.GetProjectionMatrix());
-            
+            Shader.SetMatrix4(model,      transform.GetTranslation(), false);
+            Shader.SetMatrix4(projection, camera.GetProjectionMatrix());
+            Shader.SetMatrix4(view      , camera.GetViewMatrix());
+
             mesh.Draw();
 
-            texture.Unbind();
-            Shader.Detach();
+            Shader.DetachShader();
+            Texture.UnBind();
         }
 
+        public void Dispose()
+        {
+            shader.Dispose();
+            mesh.Dispose();
+            texture.Dispose();
+        }
     }
 }

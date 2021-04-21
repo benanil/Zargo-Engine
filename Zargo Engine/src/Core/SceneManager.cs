@@ -1,39 +1,23 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ZargoEngine.Core;
 
 namespace ZargoEngine
 {
-    public static class SceneManager
+    public class SceneManager : NativeSingleton<SceneManager>
     {
-        public static List<Scene> scenes = new List<Scene>();
-
-        private static Scene _currentScene;
-        public static Scene currentScene
-        {
-            get
-            {
-                if (_currentScene == null){
-                    _currentScene = scenes[0];
-                }
-                return _currentScene;
-            }
-            set
-            {
-                _currentScene = value;
-            }
-        }
+        public List<Scene> scenes = new();
+        public static Scene currentScene;
 
         public static void AddScene(Scene scene){
-            if (!scenes.Contains(scene)){
-                scenes.Add(scene);
-            }
+            instance.scenes.Add(scene);
         }
 
-        public static void LoadScene(int index){
-            var findedScene = scenes[index];
-            
+        public static void LoadScene(int index)
+        {
+            var findedScene = instance.scenes[index];
+
             if (findedScene == null){
                 Console.WriteLine("Scene index doesnt exist");
                 return;
@@ -43,8 +27,9 @@ namespace ZargoEngine
             // do stuff
         }
 
-        public static void LoadScene(string name){
-            var findedScene = scenes.Find(x => x.name == name);
+        public static void LoadScene(string name)
+        {
+            var findedScene = instance.scenes.Find(x => x.name == name);
 
             if (findedScene == null){
                 Console.WriteLine("scene couldnt finded");
@@ -55,13 +40,17 @@ namespace ZargoEngine
         }
 
         public static string GetUniqeName(string name){
-            if (scenes.Any(x => x.name == name)) return "scene" + scenes.Count;
+            if (instance.scenes.Any(x => x.name == name)) return "scene" + instance.scenes.Count;
             return name;
         }
 
         public static string GetName(){
-            return "scene" + scenes.Count;
+            return "scene" + instance.scenes.Count;
         }
 
+        public static void Dispose()
+        {
+            currentScene.Dispose();
+        }
     }
 }

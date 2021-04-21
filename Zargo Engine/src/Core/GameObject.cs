@@ -1,7 +1,6 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using ZargoEngine.src.Core;
+using ZargoEngine.Rendering;
 
 namespace ZargoEngine
 {
@@ -12,21 +11,25 @@ namespace ZargoEngine
 
         private List<Behaviour> behaviours = new List<Behaviour>();
 
-        public GameObject(string name,Transform transform){
+        public GameObject(string name, Transform transform)
+        {
             this.name = name;
             this.transform = transform;
             SceneManager.currentScene.AddGameObject(this);
         }
 
-        public void Start(){
-            for (int i = 0; i < behaviours.Count; i++){
+        public void Start()
+        {
+            for (int i = 0; i < behaviours.Count; i++)
+            {
                 behaviours[i].Start();
             }
         }
 
         public void Update()
         {
-            for (int i = 0; i < behaviours.Count; i++){
+            for (int i = 0; i < behaviours.Count; i++)
+            {
                 behaviours[i].Update();
             }
         }
@@ -40,6 +43,5 @@ namespace ZargoEngine
         {
             return behaviours.Find(x => x.GetType() == type);
         }
-
     }
 }

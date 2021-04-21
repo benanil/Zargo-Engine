@@ -1,47 +1,40 @@
-﻿
-using MiddleGames;
-using MiddleGames.Engine.Rendering;
+﻿using System;
 using System.Collections.Generic;
 using ZargoEngine.Rendering;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using ZargoEngine.Bindings;
 
 namespace ZargoEngine
 {
-    public class Scene
+    public class Scene : IDisposable
     {
         public string name;
         public Camera camera;
 
-        private List<GameObject> gameObjects = new();
-        private List<MeshRenderer> meshRenderers = new();
-        
+        private List<GameObject> gameObjects = new List<GameObject>();
+        private List<MeshRenderer> meshRenderers = new List<MeshRenderer>();
+
         private bool started;
-        
-        float deltaX,deltaY;
 
-        private const float cameraSens = 20;
-        private const float cameraMoveSpeed = .2f;
-
-        private float currentCameraSpeed;
-
-        public Scene(Camera camera, string name) {
+        public Scene(Camera camera, string name)
+        {
             this.name = SceneManager.GetUniqeName(name);
             this.camera = camera;
         }
 
-        public Scene(Camera camera) {
+        public Scene(Camera camera)
+        {
             this.name = SceneManager.GetName();
             this.camera = camera;
         }
 
-        public void Start() {
+        public void Start()
+        {
+            mouseOldPos = Input.MousePosition();
             started = true;
 
-            //var mousePos = Game.instance.MousePosition;
-            //lastPos = new Vector2(mousePos.X, mousePos.Y);
-
-            for (int i = 0; i < gameObjects.Count; i++) {
+            for (int i = 0; i < gameObjects.Count; i++){
                 gameObjects[i].Start();
             }
         }
@@ -50,66 +43,100 @@ namespace ZargoEngine
         {
             if (!started)
                 return;
-            for (int i = 0; i < meshRenderers.Count; i++) {
+
+            for (int i = 0; i < meshRenderers.Count; i++){
                 meshRenderers[i].Render(camera);
             }
         }
 
-        public void Update() {
-            if (!started)
-                return;
+        public void Update()
+        {
+            if (!started) return;
 
-            for (int i = 0; i < gameObjects.Count; i++) {
+            for (int i = 0; i < gameObjects.Count; i++){
                 gameObjects[i].Update();
             }
 
-            Input();
+            if (Input.GetKeyDown(Keys.Enter) || Input.GetKeyDown(Keys.KeyPadEnter)){
+                LogGame();
+            }
+
+            SceneMovement();
         }
 
-        private void Input()
+        private Vector2 mouseOldPos;
+        private readonly float cameraRotateSpeed = 100f, cameraMoveSpeed = 3f;
+
+        public void LogGame()
         {
-            //Vector2 mousePos = Game.instance.MousePosition;
-            //
-            //deltaX = mousePos.X - lastPos.X;
-            //deltaY = mousePos.Y - lastPos.Y;
-            //lastPos = new Vector2(mousePos.X, mousePos.Y);
-            //
-            //camera.Pitch = MathHelper.Clamp((float)(camera.Pitch - deltaX * cameraSens * Time.DeltaTime), -89, 89);
-            //camera.Yaw   = MathHelper.Clamp((float)(camera.Yaw - deltaY * cameraSens * Time.DeltaTime), -89, 89);
-
-            deltaX = Game.instance.IsKeyDown(Keys.KeyPad6) ? 1 : Game.instance.IsKeyDown(Keys.KeyPad4) ? -1 : 0;
-            deltaY = Game.instance.IsKeyDown(Keys.KeyPad8) ? 1 : Game.instance.IsKeyDown(Keys.KeyPad5) ? -1 : 0;
-
-            if (deltaX != 0) camera.Pitch = MathHelper.Clamp((float)(camera.Pitch - deltaX * cameraSens * Time.DeltaTime), -89, 89);
-            if (deltaY != 0) camera.Yaw   = MathHelper.Clamp((float)(camera.Yaw - deltaY * cameraSens   * Time.DeltaTime), -89, 89);
-
-            currentCameraSpeed = Game.instance.IsKeyDown(Keys.LeftShift) ? cameraMoveSpeed * 2 : cameraMoveSpeed;
-            
-            if (Game.instance.IsKeyReleased(Keys.W)) camera.Position += camera.Front * currentCameraSpeed; //Forward 
-            if (Game.instance.IsKeyReleased(Keys.S)) camera.Position -= camera.Front * currentCameraSpeed; //Backwards
-            if (Game.instance.IsKeyReleased(Keys.A)) camera.Position -= Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Left
-            if (Game.instance.IsKeyReleased(Keys.D)) camera.Position += Vector3.Normalize(Vector3.Cross(camera.Front, camera.Up)) * currentCameraSpeed; //Right
-            if (Game.instance.IsKeyReleased(Keys.E)) camera.Position += camera.Up * currentCameraSpeed; //Up 
-            if (Game.instance.IsKeyReleased(Keys.Q)) camera.Position -= camera.Up * currentCameraSpeed; //Down
+            Console.Clear();
+            Console.WriteLine("////////////////////////////////");
+            Debug.Log("CAMERA");
+            Debug.Log("position: " + camera.Position);
+            Debug.Log($"pitch:{camera.Pitch}");
+            Debug.Log($"pitch:{camera.Yaw}");
+            Console.WriteLine('\n');
         }
 
-        public void Stop(){
+        private void SceneMovement()
+        {
+            if (!Input.MouseButtonDown(MouseButton.Right))
+                return;
+
+            float targetMoveSpeed = Input.GetKey(Keys.LeftShift) ? cameraMoveSpeed * 2 : cameraMoveSpeed;
+
+            if (Input.GetKey(Keys.W)) camera.Position += camera.Front * targetMoveSpeed * Time.DeltaTime;
+            if (Input.GetKey(Keys.S)) camera.Position -= camera.Front * targetMoveSpeed * Time.DeltaTime;
+            if (Input.GetKey(Keys.A)) camera.Position -= camera.Right * targetMoveSpeed * Time.DeltaTime;
+            if (Input.GetKey(Keys.D)) camera.Position += camera.Right * targetMoveSpeed * Time.DeltaTime;
+            if (Input.GetKey(Keys.Q)) camera.Position -= camera.Up    * targetMoveSpeed * Time.DeltaTime;
+            if (Input.GetKey(Keys.E)) camera.Position += camera.Up    * targetMoveSpeed * Time.DeltaTime;
+
+            if ((Input.MousePosition() - mouseOldPos).Length < 200)
+            {
+                Vector2 mouseDirection = Input.MousePosition() - mouseOldPos;
+                camera.Pitch -= mouseDirection.Y * Time.DeltaTime * cameraRotateSpeed;
+                camera.Yaw += mouseDirection.X * Time.DeltaTime * cameraRotateSpeed;
+            }
+
+            // infinite mouse
+            MouseBindings.GetCursorPos(out MouseBindings.POINT point);
+
+            if (point.X > 1438) MouseBindings.SetCursorPos(2, point.Y);
+            if (point.X < 2)    MouseBindings.SetCursorPos(1400, point.Y);
+            if (point.Y > 730)  MouseBindings.SetCursorPos(point.X, 2);
+            if (point.Y < 2)    MouseBindings.SetCursorPos(point.X, 730);
+            // infinite mouse end
+
+            mouseOldPos = Input.MousePosition();
+        }
+
+        public void Stop()
+        {
             started = false;
         }
 
-        public GameObject FindGameObjectByName(string name){
+        public GameObject FindGameObjectByName(string name)
+        {
             return gameObjects.Find(x => x.name == name);
         }
 
-        public GameObject AddGameObject(GameObject gameObject){
+        public GameObject AddGameObject(GameObject gameObject)
+        {
             gameObjects.Add(gameObject);
             return gameObject;
         }
 
-        public MeshRenderer AddMeshRenderer(MeshRenderer meshRenderer){
+        public MeshRenderer AddMeshRenderer(MeshRenderer meshRenderer)
+        {
             meshRenderers.Add(meshRenderer);
             return meshRenderer;
         }
 
+        public void Dispose()
+        {
+            meshRenderers.ForEach(x => x.Dispose());
+            GC.SuppressFinalize(this);
+        }
     }
 }

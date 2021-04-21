@@ -1,19 +1,24 @@
 ﻿using OpenTK.Mathematics;
 using System;
 
-namespace MiddleGames.Engine.Rendering
+namespace ZargoEngine.Rendering
 {
+    // This is the camera class as it could be set up after the tutorials on the website
+    // It is important to note there are a few ways you could have set up this camera, for example
+    // you could have also managed the player input inside the camera class, and a lot of the properties could have
+    // been made into functions.
+
+    // TL;DR: This is just one of many ways in which we could have set up the camera
+    // Check out the web version if you don't know why we are doing a specific thing or want to know more about the code
     public class Camera
     {
         // Those vectors are directions pointing outwards from the camera to define how it rotated
         private Vector3 _front = -Vector3.UnitZ;
-        private Vector3 _up    =  Vector3.UnitY;
-        private Vector3 _right =  Vector3.UnitX;
 
-        public Vector3 Front => _front;
-        public Vector3 Up    => _up;
-        public Vector3 Right => _right;
-        
+        private Vector3 _up = Vector3.UnitY;
+
+        private Vector3 _right = Vector3.UnitX;
+
         // Rotation around the X axis (radians)
         private float _pitch;
 
@@ -21,35 +26,26 @@ namespace MiddleGames.Engine.Rendering
         private float _yaw = -MathHelper.PiOver2; // Without this you would be started rotated 90 degrees right
 
         // The field of view of the camera (radians)
-        private float _fov = (float)Math.PI / 4; // 90 degrees
+        private float _fov = MathHelper.PiOver2;
 
-        public int ScreenWidth, ScreenHeight;
-
-        public Camera(Vector3 position, int ScreenWidth, int ScreenHeight)
+        public Camera(Vector3 position, float aspectRatio,Vector3 front )
         {
+            _front = front;
             Position = position;
-            this.ScreenHeight = ScreenHeight;
-            this.ScreenWidth = ScreenWidth;
+            AspectRatio = aspectRatio;
         }
 
         // The position of the camera
-        private Vector3 _position;
-        public Vector3 Position 
-        {
-            get => _position;
-            set
-            {
-                if (value != _position){
-                    Console.WriteLine("camera position" + value);
-                }
-                _position = value;
-
-            }
-            
-        }
+        public Vector3 Position { get; set; }
 
         // This is simply the aspect ratio of the viewport, used for the projection matrix
-        public float AspectRatio => ScreenWidth / ScreenHeight;
+        public float AspectRatio { private get; set; }
+
+        public Vector3 Front => _front;
+
+        public Vector3 Up => _up;
+
+        public Vector3 Right => _right;
 
         // We convert from degrees to radians as soon as the property is set to improve performance
         public float Pitch
@@ -63,7 +59,6 @@ namespace MiddleGames.Engine.Rendering
                 var angle = MathHelper.Clamp(value, -89f, 89f);
                 _pitch = MathHelper.DegreesToRadians(angle);
                 UpdateVectors();
-                Console.WriteLine("pitch: " + _pitch);
             }
         }
 
@@ -75,7 +70,6 @@ namespace MiddleGames.Engine.Rendering
             {
                 _yaw = MathHelper.DegreesToRadians(value);
                 UpdateVectors();
-                Console.WriteLine("yaw: " + _yaw);
             }
         }
 
@@ -102,6 +96,7 @@ namespace MiddleGames.Engine.Rendering
         public Matrix4 GetProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
+            //return Matrix4.CreateOrthographic(5, 5, 0.01f, 100f);
         }
 
         // This function is going to update the direction vertices using some of the math learned in the web tutorials

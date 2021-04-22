@@ -17,6 +17,7 @@ namespace ZargoEngine
             }
         }
 
+
         public static float MouseX() => MouseAxis.X;
         public static float MouseY() => MouseAxis.Y;
 

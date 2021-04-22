@@ -7,40 +7,14 @@ namespace ZargoEngine.Rendering
     public class MeshCreator : NativeSingleton<MeshCreator>
     {
         readonly Vector3[] cubeVertexes = {
-            new Vector3(-0.5f, -0.5f,  -0.5f),
-            new Vector3(0.5f, 0.5f,  -0.5f),
-            new Vector3(0.5f, -0.5f,  -0.5f),
-            new Vector3(-0.5f, 0.5f,  -0.5f),
- 
-            //back
-            new Vector3(0.5f, -0.5f,  -0.5f),
-            new Vector3(0.5f, 0.5f,  -0.5f),
-            new Vector3(0.5f, 0.5f,  0.5f),
-            new Vector3(0.5f, -0.5f,  0.5f),
- 
-            //right
-            new Vector3(-0.5f, -0.5f,  0.5f),
-            new Vector3(0.5f, -0.5f,  0.5f),
-            new Vector3(0.5f, 0.5f,  0.5f),
-            new Vector3(-0.5f, 0.5f,  0.5f),
- 
-            //top
-            new Vector3(0.5f, 0.5f,  -0.5f),
-            new Vector3(-0.5f, 0.5f,  -0.5f),
-            new Vector3(0.5f, 0.5f,  0.5f),
-            new Vector3(-0.5f, 0.5f,  0.5f),
- 
-            //front
-            new Vector3(-0.5f, -0.5f,  -0.5f),
-            new Vector3(-0.5f, 0.5f,  0.5f),
-            new Vector3(-0.5f, 0.5f,  -0.5f),
-            new Vector3(-0.5f, -0.5f,  0.5f),
- 
-            //bottom
-            new Vector3(-0.5f, -0.5f,  -0.5f),
-            new Vector3(0.5f, -0.5f,  -0.5f),
-            new Vector3(0.5f, -0.5f,  0.5f),
-            new Vector3(-0.5f, -0.5f,  0.5f)
+            new Vector3 (0, 0, 0),
+            new Vector3 (1, 0, 0),
+            new Vector3 (1, 1, 0),
+            new Vector3 (0, 1, 0),
+            new Vector3 (0, 1, 1),
+            new Vector3 (1, 1, 1),
+            new Vector3 (1, 0, 1),
+            new Vector3 (0, 0, 1),
         };
         
         readonly uint[] cubeIndices = {
@@ -58,19 +32,6 @@ namespace ZargoEngine.Rendering
               1, 3, 4,
               5, 1, 2
         };
-
-        //f 5/1/1  3/2/1  1/3/1
-        //f 3/2/2  8/4/2  4/5/2
-        //f 7/6/3  6/7/3  8/8/3
-        //f 2/9/4  8/10/4 6/11/4
-        //f 1/3/5  4/5/5  2/9/5
-        //f 5/12/6 2/9/6  6/7/6
-        //f 5/1/1  7/13/1 3/2/1
-        //f 3/2/2  7/14/2 8/4/2
-        //f 7/6/3  5/12/3 6/7/3
-        //f 2/9/4  4/5/4  8/10/4
-        //f 1/3/5  3/2/5  4/5/5
-        //f 5/12/6 1/3/6  2/9/6
 
         Vector2[] cubeCoords = new Vector2[] {
             new Vector2(0.0f, 0.0f),
@@ -165,23 +126,18 @@ namespace ZargoEngine.Rendering
         };
 
         int[] inds = {
-            //left
-            0,1,2,0,3,1,
- 
-            //back
-            4,5,6,4,6,7,
- 
-            //right
-            8,9,10,8,10,11,
- 
-            //top
-            13,14,12,13,15,14,
- 
-            //front
-            16,17,18,16,19,17,
- 
-            //bottom
-            20,21,22,20,22,23
+            0, 2, 1, //face front
+	        0, 3, 2,
+            2, 3, 4, //face top
+	        2, 4, 5,
+            1, 2, 5, //face right
+	        1, 5, 6,
+            0, 7, 4, //face left
+	        0, 4, 3,
+            5, 4, 7, //face back
+	        5, 7, 6,
+            0, 6, 7, //face bottom
+	        0, 1, 6
         };
 
         private Mesh cube;
@@ -190,10 +146,11 @@ namespace ZargoEngine.Rendering
         /// <summary>
         /// creates a Cube
         /// </summary>
+        [System.Obsolete("dont use for now")]
         public static Mesh CreateCube()
         {
             if (instance.cube == null){
-                instance.cube = new Mesh(instance.cubeVertexes, instance.inds, instance.cubeCoords);
+                //instance.cube = new Mesh(instance.cubeVertexes, instance.inds, instance.cubeCoords);
             }
             return instance.cube;
         }
@@ -201,10 +158,11 @@ namespace ZargoEngine.Rendering
         /// <summary>
         /// creates a quad
         /// </summary>
+        [System.Obsolete("dont use for now")]
         public static Mesh CreateQuad()
         {
             if (instance.quad == null){
-                instance.quad = new Mesh(instance.quadVertexes, instance.quadIndices,instance.quadCoords);
+                //instance.quad = new Mesh(instance.quadVertexes, instance.quadIndices,instance.quadCoords);
             }
 
             return instance.quad;

@@ -83,7 +83,7 @@ namespace ZargoEngine
             if (!Input.MouseButtonDown(MouseButton.Right))
                 return;
 
-            float targetMoveSpeed = Input.GetKey(Keys.LeftShift) ? cameraMoveSpeed * 2 : cameraMoveSpeed;
+            float targetMoveSpeed = Input.GetKey(Keys.LeftShift) ? cameraMoveSpeed * 4 : cameraMoveSpeed;
 
             if (Input.GetKey(Keys.W)) camera.Position += camera.Front * targetMoveSpeed * Time.DeltaTime;
             if (Input.GetKey(Keys.S)) camera.Position -= camera.Front * targetMoveSpeed * Time.DeltaTime;

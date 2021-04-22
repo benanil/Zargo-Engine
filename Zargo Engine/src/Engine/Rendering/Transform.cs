@@ -10,12 +10,8 @@ namespace ZargoEngine.Rendering
         private Vector3 _eulerAngels;
         public Vector3 eulerAngles
         {
-            get
-            {
-                return _eulerAngels;
-            }
-            set
-            {
+            get => _eulerAngels;
+            set{
                 _eulerAngels = value;
                 rotation = Quaternion.FromEulerAngles(value);
             }
@@ -23,7 +19,7 @@ namespace ZargoEngine.Rendering
 
         public Quaternion rotation;
 
-        public float scale = 1;
+        public float scale = 1f;
 
         public Transform(Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)
         {
@@ -32,8 +28,7 @@ namespace ZargoEngine.Rendering
             this.scale = scale;
         }
 
-        public Matrix4 GetTranslation()
-        {
+        public Matrix4 GetTranslation(){
             return Matrix4.Transpose(Matrix4.CreateScale(scale) *
                    Matrix4.CreateTranslation(position)          *
                    Matrix4.CreateRotationX  (eulerAngles.X)     *

@@ -9,6 +9,8 @@ namespace ZargoEngine
         private static float horizontal;
         private static float vertical;
 
+        public static Vector2 mouseWheelOffset;
+
         public static float Horizontal(){
             float target = 0;
             if (GetKey(Keys.A) || GetKey(Keys.Left))  target += 1;

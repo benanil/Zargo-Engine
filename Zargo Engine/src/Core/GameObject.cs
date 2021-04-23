@@ -7,15 +7,25 @@ namespace ZargoEngine
     public class GameObject
     {
         public string name;
-        public Transform transform;
+        public Transform _transform;
+        public Transform transform
+        {
+            get => _transform;
+            set
+            {
+                // value changed
+                if (value != transform)
+                {
+                    _transform = value;
+                }
+            }
+        }
 
-        private List<Behaviour> behaviours = new List<Behaviour>();
+        private List<MonoBehaviour> behaviours = new List<MonoBehaviour>();
 
-        public GameObject(string name, Transform transform)
+        public GameObject(string name)
         {
             this.name = name;
-            this.transform = transform;
-            SceneManager.currentScene.AddGameObject(this);
         }
 
         public void Start()
@@ -34,12 +44,20 @@ namespace ZargoEngine
             }
         }
 
-        public void AddComponent(Behaviour component)
+        public void OnGUI()
+        {
+            for (int i = 0; i < behaviours.Count; i++)
+            {
+                behaviours[i].OnGUI();
+            }
+        }
+
+        public void AddComponent(MonoBehaviour component)
         {
             behaviours.Add(component);
         }
 
-        public Behaviour GetBehaviour(Type type)
+        public MonoBehaviour GetBehaviour(Type type)
         {
             return behaviours.Find(x => x.GetType() == type);
         }

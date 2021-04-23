@@ -16,6 +16,8 @@ namespace ZargoEngine
         private List<MeshRenderer> meshRenderers = new List<MeshRenderer>();
 
         private bool started;
+        private Vector2 mouseOldPos;
+        private readonly float cameraRotateSpeed = 100, cameraMoveSpeed = 3f;
 
         public Scene(Camera camera, string name)
         {
@@ -63,9 +65,6 @@ namespace ZargoEngine
 
             SceneMovement();
         }
-
-        private Vector2 mouseOldPos;
-        private readonly float cameraRotateSpeed = 100, cameraMoveSpeed = 3f;
 
         public void LogGame()
         {

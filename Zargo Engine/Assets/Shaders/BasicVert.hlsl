@@ -10,19 +10,15 @@ uniform mat4 projection;
 
 in vec3 worldSpacePosition;
 
-out vec3 pworldSpacePosition;
-out vec3 pLocalPosition;
-out vec3 pnormal;
+out vec3 FragPos;
+out vec3 Normal;
 out vec2 texCoord;
-
-const vec3 LightPosition = vec3(0.0,100.0,50.0);
 
 void main(void)
 {
-    pworldSpacePosition = worldSpacePosition;
-    
-    pnormal = aNormal;
-    pLocalPosition = aPosition.xyz;
+    Normal = aNormal;
+        
+    FragPos = vec3(model * vec4(aPosition, 1.0));
 
     texCoord = aTexCoord;
     gl_Position = vec4(aPosition, 1) *  model * view * projection;

@@ -5,6 +5,8 @@ namespace ZargoEngine.Rendering
 {
     public class Transform
     {
+        public GameObject gameObject;
+
         public Vector3 position = Vector3.Zero;
 
         private Vector3 _eulerAngels;
@@ -19,10 +21,11 @@ namespace ZargoEngine.Rendering
 
         public Quaternion rotation;
 
-        public float scale = 1f;
+        public float scale = 5f;
 
-        public Transform(Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)
+        public Transform(GameObject gameObject,Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)
         {
+            this.gameObject = gameObject;
             this.position = position;
             this.eulerAngles = rotation;
             this.scale = scale;

@@ -10,7 +10,7 @@ namespace ZargoEngine.Rendering
     {
         private readonly int program;
 
-        public Shader(string vertexPath, string fragmentPath)
+        public Shader(string vertexPath, string fragmentPath) 
         {
             string vertexSource = string.Empty;
             string fragmentSource = string.Empty;
@@ -23,6 +23,11 @@ namespace ZargoEngine.Rendering
                 fragmentSource = reader.ReadToEnd();
             }
 
+            CompileShader(ref program, ref vertexSource, ref fragmentSource);
+        }
+
+        public void CompileShader(ref int program,ref string vertexSource, ref string fragmentSource)
+        {
             int vertexID = GL.CreateShader(ShaderType.VertexShader);
 
             GL.ShaderSource(vertexID, vertexSource);
@@ -31,7 +36,8 @@ namespace ZargoEngine.Rendering
 
             GL.GetShader(vertexID, ShaderParameter.CompileStatus, out int log);
 
-            if (log == 0){
+            if (log == 0)
+            {
                 GL.GetShaderInfoLog(vertexID, out string infoLog);
                 Console.WriteLine(infoLog);
                 return;
@@ -44,9 +50,10 @@ namespace ZargoEngine.Rendering
 
             Console.WriteLine(GL.GetError());
 
-            GL.GetShader(vertexID, ShaderParameter.CompileStatus, out log);
+            GL.GetShader(fragmentID, ShaderParameter.CompileStatus, out log);
 
-            if (log == 0){
+            if (log == 0)
+            {
                 GL.GetShaderInfoLog(fragmentID, out string infoLog);
                 Console.WriteLine(infoLog);
                 return;
@@ -60,9 +67,10 @@ namespace ZargoEngine.Rendering
 
             Console.WriteLine(GL.GetError());
 
-            GL.GetShader(program,ShaderParameter.CompileStatus,out log);
+            GL.GetShader(program, ShaderParameter.CompileStatus, out log);
 
-            if (log == 0){
+            if (log == 0)
+            {
                 GL.GetShaderInfoLog(program, out string infoLog);
                 Console.WriteLine(infoLog);
                 return;

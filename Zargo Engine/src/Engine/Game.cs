@@ -5,15 +5,22 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System;
 using ZargoEngine.AssetManagement;
 using ZargoEngine.Rendering;
+using ZargoEngine.Editor;
+using Dear_ImGui_Sample;
+using ImGuiNET;
 
 namespace ZargoEngine
 {
     public class Game : GameWindow
     {
-        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
+        private ImGuiController _controller;
+        private Camera camera;
+        private Inspector inspector;
+        private GameObject firstObject;
+
+        public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) 
         {
 
         }
@@ -22,42 +29,77 @@ namespace ZargoEngine
         {
             base.OnLoad();
             GL.ClearColor(Color4.Bisque);
-            
-            CursorVisible = false;
 
-            Camera camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
+            LoadScene();
+
+            inspector = new Inspector();
+            inspector.currentObject = firstObject;
+
+            _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
+
+            Debug.Log("hour: " + System.DateTime.Now.Hour);
+            
+            if (System.DateTime.Now.Hour > 16){
+                ImGuiController.DarkTheme();
+            }
+            else{
+                ImGui.StyleColorsLight();
+            }
+        }
+
+        private void LoadScene()
+        { 
+            camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");
 
-            var mesh = AssetManager.GetMesh("Models/sword.obj");
-            Console.WriteLine(mesh.ToString());
-            //var mesh    = MeshCreator.CreateCube();
+            var mesh = AssetManager.GetMesh("Models/Atilla.obj");
+            //var mesh    = MeshCreator.CreateQuad();
             var shader  = AssetManager.GetShader("Shaders/BasicVert.hlsl", "Shaders/BasicFrag.hlsl");
-            var texture = AssetManager.GetTexture("Images/wood_img.jpg");
+            var texture = AssetManager.GetTexture("Images/hero texture.png");
 
+            firstObject = new GameObject("first Obj");
+            firstObject.transform  = new Transform(firstObject, new Vector3(0, 0, 0), new Vector3(MathHelper.PiOver2, 0, 0));
 
-            scene.AddMeshRenderer(new MeshRenderer(mesh, shader, new Transform(new Vector3(0,0,0)), ref texture));
+            firstObject.AddComponent(new FirstBehaviour());
+
+            scene.AddMeshRenderer(new MeshRenderer(mesh, shader, firstObject, ref texture));
+            scene.AddGameObject(firstObject);
 
             SceneManager.AddScene(scene);
             SceneManager.LoadScene(0);
-            GL.Enable(EnableCap.DepthTest);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
+            
+            GL.Enable(EnableCap.DepthTest);
             GL.CullFace(CullFaceMode.Back);
-
+            
             SceneManager.currentScene?.Render();
+
+            EditWindow();
+
+            ImGui.ShowDemoWindow();
+
+            _controller.Render();
 
             GL.Flush();
             SwapBuffers();
             base.OnRenderFrame(args);
         }
 
+        private void EditWindow()
+        {
+            inspector.Render();
+        }
+
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
             Time.DeltaTime = (float)args.Time;
+
+            _controller.Update(this, Time.DeltaTime);
 
             SceneManager.currentScene.Update();
             MainInput();
@@ -66,14 +108,17 @@ namespace ZargoEngine
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
-            Debug.Log("MOUSE SCROLL: " + e.Offset);
         }
 
         protected override void OnResize(ResizeEventArgs e)
         {
-            //camera.AspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
+            if (ClientRectangle.Size.X > 0 && ClientRectangle.Size.Y > 0)
+            {
+                camera.AspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
+            }
             GL.Viewport(0, 0, e.Width, e.Height);
             base.OnResize(e);
+            _controller.WindowResized(e.Width, e.Height);
         }
 
         private void MainInput()

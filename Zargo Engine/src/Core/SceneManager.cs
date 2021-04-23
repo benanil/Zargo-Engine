@@ -38,7 +38,7 @@ namespace ZargoEngine
             currentScene.Start();
             // do stuff
         }
-
+        
         public static string GetUniqeName(string name){
             if (instance.scenes.Any(x => x.name == name)) return "scene" + instance.scenes.Count;
             return name;

@@ -10,9 +10,9 @@ namespace ZargoEngine.AssetManagement
     {
         public const string AssetsPath = "../../../Assets/";
 
-        private Dictionary<string, Shader>  shaders  = new();
-        private Dictionary<string, Mesh>    meshes   = new();
-        private Dictionary<string, Texture> textures = new();
+        private readonly Dictionary<string, Shader>  shaders  = new();
+        private readonly Dictionary<string, Mesh>    meshes   = new();
+        private readonly Dictionary<string, Texture> textures = new();
 
         public static Shader GetShader(string vertexPath, string fragmentPath)
         {
@@ -30,11 +30,9 @@ namespace ZargoEngine.AssetManagement
 
         public static Texture GetTexture(string path)
         {
-            string realPath = AssetsPath + path;
+            if (instance.textures.TryGetValue(path, out Texture texture)) return texture;
 
-            if (instance.textures.TryGetValue(realPath, out Texture texture)) return texture;
-
-            texture = new Texture(realPath);
+            texture = new Texture(path);
 
             instance.textures.Add(path, texture);
 

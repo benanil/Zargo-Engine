@@ -1,10 +1,13 @@
 ﻿
 
+
+using ZargoEngine.Rendering;
+
 namespace ZargoEngine.Editor
 {
     public class Inspector : EditorWindow
     {
-        public GameObject currentObject;
+        public Component currentObject;
 
         public Inspector()
         {
@@ -13,7 +16,18 @@ namespace ZargoEngine.Editor
 
         public override void OnGUI()
         {
-            currentObject?.OnGUI();
+            switch (currentObject)
+            {
+                case GameObject go:
+                    go.DrawGUI();
+                    break;
+                case MeshRenderer meshRenderer:
+                    meshRenderer.DrawGUI();
+                    break;
+                case DirectionalLight directionalLight:
+                    directionalLight.DrawGUI();
+                    break;
+            }
         }
     }
 }

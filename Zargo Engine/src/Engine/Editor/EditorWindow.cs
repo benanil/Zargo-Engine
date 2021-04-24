@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 namespace ZargoEngine.Editor
 {
-    public class EditorWindow
+    public class EditorWindow : IDrawable
     {
         private protected bool windowActive = false;
         public string title = "Editor Window";
 
         private List<Menu> menus = new List<Menu>(); 
 
-        public void Render()
+        public void DrawGUI()
         {
-            ImGui.Begin(title, ref windowActive);
+            ImGui.Begin(title, ref windowActive,ImGuiWindowFlags.None);
 
             if (ImGui.BeginMenuBar())
             {

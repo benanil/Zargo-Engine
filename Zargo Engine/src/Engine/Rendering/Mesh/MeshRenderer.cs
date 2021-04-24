@@ -1,8 +1,11 @@
-﻿using System;
+﻿using ImGuiNET;
+using OpenTK.Mathematics;
+using System;
+using ZargoEngine.Helper;
 
 namespace ZargoEngine.Rendering
 {
-    public class MeshRenderer : IDisposable
+    public class MeshRenderer : Component, IDisposable
     {
         private readonly int model;
         private readonly int view;
@@ -15,21 +18,31 @@ namespace ZargoEngine.Rendering
         public Mesh mesh;
         public Texture texture;
 
-        readonly Transform transform;
+        public readonly Transform transform;
         public readonly GameObject gameObject;
 
         public MeshRenderer(Mesh mesh, Shader shader,GameObject gameObject, ref Texture texture)
         {
+            name = "Mesh Renderer";
             this.mesh       = mesh;
             this.shader     = shader;
             this.transform  = gameObject.transform;
             this.texture    = texture;
             this.gameObject = gameObject;
 
+            gameObject.AddComponent(this);
+
             projection = shader.GetUniformLocation("projection");
             view       = shader.GetUniformLocation("view");
             model      = shader.GetUniformLocation("model");
             worldSpacePosition = shader.GetUniformLocation("worldSpacePosition");
+        }
+
+        public override void DrawGUI()
+        {
+            // comining
+            ImGui.TextColored(Color4.Orange.ToSystem(), name);
+            ImGui.Text("comining");
         }
 
         public void Render(in Camera camera)
@@ -55,6 +68,7 @@ namespace ZargoEngine.Rendering
             shader.Dispose();
             mesh.Dispose();
             texture.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

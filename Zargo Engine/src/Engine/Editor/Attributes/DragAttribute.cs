@@ -11,7 +11,7 @@ namespace ZargoEngine.Editor
         public string format = string.Empty;
 
         public DragAttribute(float speed = 1,float min = 0, float max = 10,string format = ""){
-            this.format = format == "" ? $"{0}" : format;
+            this.format = format == "" ? "%.1f" : format;
             this.speed = speed;
             this.min = min;
             this.max = max;

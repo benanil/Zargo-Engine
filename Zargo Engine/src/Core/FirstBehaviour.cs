@@ -6,6 +6,7 @@ namespace ZargoEngine
 {
     public class FirstBehaviour : MonoBehaviour
     {
+        [Slider()]
         public int denemeInt;
         public float denemeFloat;
         public string deneme;

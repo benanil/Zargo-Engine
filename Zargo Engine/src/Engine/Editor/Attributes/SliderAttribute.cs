@@ -14,7 +14,7 @@ namespace ZargoEngine.Editor
         public SliderAttribute(float min = 0, float max = 20, string format = "",ImGuiSliderFlags imGuiSliderFlags = ImGuiSliderFlags.None)
         {
             this.imGuiSliderFlags = imGuiSliderFlags;
-            this.format = format == "" ? $"{0}" : format;
+            this.format = format == "" ? "%.1f" : format;
             this.min = min;
             this.max = max;
         }

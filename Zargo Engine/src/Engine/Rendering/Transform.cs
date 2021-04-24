@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace ZargoEngine.Rendering
 {
-    public class Transform
+    public class Transform : Component
     {
         public GameObject gameObject;
 
@@ -25,6 +25,8 @@ namespace ZargoEngine.Rendering
 
         public Transform(GameObject gameObject,Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)
         {
+            name = "Transform";
+            gameObject.AddComponent(this);
             this.gameObject = gameObject;
             this.position = position;
             this.eulerAngles = rotation;

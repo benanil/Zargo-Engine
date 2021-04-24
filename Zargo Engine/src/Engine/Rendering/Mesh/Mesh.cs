@@ -114,14 +114,14 @@ namespace ZargoEngine.Rendering
             vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * Marshal.SizeOf<Vector3>(), Vertices.ToArray(), BufferUsageHint.DynamicDraw);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf<Vector3>(), 0);
+            
             Console.WriteLine(GL.GetError());
 
             eboID = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, eboID);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf<Vector3>(), 0);
 
             var uvBuffer = GL.GenBuffer();
 
@@ -187,7 +187,7 @@ namespace ZargoEngine.Rendering
         }
 
         public void Dispose(){
-            GL.DeleteBuffer(vaoID);
+            GL.DeleteVertexArray(vaoID);
             GL.DeleteBuffer(vboID);
             GL.DeleteBuffer(eboID);
             GC.SuppressFinalize(this);

@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using ZargoEngine.Rendering;
 
 namespace ZargoEngine
 {
-    public class GameObject
+    public class GameObject : Component
     {
-        public string name;
         public Transform _transform;
         public Transform transform
         {
@@ -21,43 +21,43 @@ namespace ZargoEngine
             }
         }
 
-        private List<MonoBehaviour> behaviours = new List<MonoBehaviour>();
+        private List<Component> behaviours = new List<Component>();
 
         public GameObject(string name)
         {
             this.name = name;
         }
 
-        public void Start()
+        public override void Start()
         {
-            for (int i = 0; i < behaviours.Count; i++)
-            {
+            for (int i = 0; i < behaviours.Count; i++){
                 behaviours[i].Start();
             }
         }
 
-        public void Update()
+        public override void Update()
         {
-            for (int i = 0; i < behaviours.Count; i++)
-            {
+            for (int i = 0; i < behaviours.Count; i++){
                 behaviours[i].Update();
             }
         }
 
-        public void OnGUI()
+        public override void DrawGUI()
         {
-            for (int i = 0; i < behaviours.Count; i++)
-            {
-                behaviours[i].OnGUI();
+            ImGui.LabelText(name, "Game Object");
+
+            for (int i = 0; i < behaviours.Count; i++){
+                behaviours[i].DrawGUI();
             }
         }
 
-        public void AddComponent(MonoBehaviour component)
+        public Component AddComponent(Component component)
         {
             behaviours.Add(component);
+            return component;
         }
 
-        public MonoBehaviour GetBehaviour(Type type)
+        public Component GetComponent(Type type)
         {
             return behaviours.Find(x => x.GetType() == type);
         }

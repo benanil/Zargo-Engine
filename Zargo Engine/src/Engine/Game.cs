@@ -9,6 +9,7 @@ using ZargoEngine.AssetManagement;
 using ZargoEngine.Rendering;
 using ZargoEngine.Editor;
 using Dear_ImGui_Sample;
+using System;
 using ImGuiNET;
 
 namespace ZargoEngine
@@ -18,7 +19,14 @@ namespace ZargoEngine
         private ImGuiController _controller;
         private Camera camera;
         private Inspector inspector;
+        private Hierarchy hierarchy;
         private GameObject firstObject;
+
+        private FrameBuffer frameBuffer;
+
+        private GameViewWindow GameViewWindow;
+
+        private Skybox skybox;
 
         public Game(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) 
         {
@@ -31,24 +39,13 @@ namespace ZargoEngine
             GL.ClearColor(Color4.Bisque);
 
             LoadScene();
-
-            inspector = new Inspector();
-            inspector.currentObject = firstObject;
-
-            _controller = new ImGuiController(ClientSize.X, ClientSize.Y);
-
-            Debug.Log("hour: " + System.DateTime.Now.Hour);
-            
-            if (System.DateTime.Now.Hour > 16){
-                ImGuiController.DarkTheme();
-            }
-            else{
-                ImGui.StyleColorsLight();
-            }
+            LoadGUI();
         }
-
+        
         private void LoadScene()
-        { 
+        {
+            skybox = new Skybox();
+
             camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");
 
@@ -68,9 +65,37 @@ namespace ZargoEngine
             SceneManager.AddScene(scene);
             SceneManager.LoadScene(0);
         }
+        
+        private void LoadGUI()
+        { 
+            inspector      = new Inspector();
+            hierarchy      = new Hierarchy();
+            _controller    = new ImGuiController(ClientSize.X, ClientSize.Y);
+            GameViewWindow = new GameViewWindow(this);
+            frameBuffer    = new FrameBuffer(1440, 900);
+
+            inspector.currentObject = firstObject;
+
+            var hierarchyMenu1 = new Menu("deneme");
+            var hierarchyMenu2 = new Menu("deneme2");
+            
+            hierarchyMenu1.AddMenuItem(new MenuItem("denemeler"));
+            hierarchyMenu2.AddMenuItem(new MenuItem("denesene"));
+            
+            hierarchy.AddMenuItem(hierarchyMenu1);
+            hierarchy.AddMenuItem(hierarchyMenu2);
+
+            Debug.Log("hour: " + DateTime.Now.Hour);
+            
+            if (DateTime.Now.Hour > 16 || DateTime.Now.Hour < 5) ImGuiController.DarkTheme();
+            else ImGui.StyleColorsLight();
+        }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
+            skybox.Use(camera);
+
+            frameBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             
             GL.Enable(EnableCap.DepthTest);
@@ -78,9 +103,11 @@ namespace ZargoEngine
             
             SceneManager.currentScene?.Render();
 
-            EditWindow();
+            FrameBuffer.Unbind();
 
-            ImGui.ShowDemoWindow();
+            GameViewWindow.Render();
+
+            EditorWindow();
 
             _controller.Render();
 
@@ -89,9 +116,11 @@ namespace ZargoEngine
             base.OnRenderFrame(args);
         }
 
-        private void EditWindow()
+        private void EditorWindow()
         {
-            inspector.Render();
+            inspector.DrawGUI();
+            hierarchy.DrawGUI();
+            _controller.GenerateDockspace();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -114,7 +143,7 @@ namespace ZargoEngine
         {
             if (ClientRectangle.Size.X > 0 && ClientRectangle.Size.Y > 0)
             {
-                camera.AspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
+                camera.AspectRatio = AspectRatio();
             }
             GL.Viewport(0, 0, e.Width, e.Height);
             base.OnResize(e);
@@ -126,6 +155,24 @@ namespace ZargoEngine
             CursorVisible = !IsMouseButtonDown(MouseButton.Right);
             if (IsKeyReleased(Keys.Enter) || IsKeyReleased(Keys.KeyPadEnter)) LogGame();
             if (IsKeyPressed(Keys.Escape)) Close();
+        }
+
+        public FrameBuffer GetFrameBuffer()
+        {
+            return frameBuffer;
+        }
+
+        private float lastAspectRatio = 16 / 9;
+
+        public float AspectRatio()
+        {
+            if (ClientRectangle.Size.X > 0 && ClientRectangle.Size.Y > 0){
+                lastAspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
+                return lastAspectRatio;
+            }
+            else{
+                return lastAspectRatio;
+            }
         }
 
         private void LogGame()

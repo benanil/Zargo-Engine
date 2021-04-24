@@ -93,15 +93,16 @@ namespace ZargoEngine
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            skybox.Use(camera);
-
             frameBuffer.Bind();
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             
             GL.Enable(EnableCap.DepthTest);
             GL.CullFace(CullFaceMode.Back);
             
             SceneManager.currentScene?.Render();
+            
+            skybox.Use(camera);
 
             FrameBuffer.Unbind();
 

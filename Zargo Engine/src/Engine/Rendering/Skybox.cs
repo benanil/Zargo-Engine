@@ -6,6 +6,8 @@ namespace ZargoEngine.Rendering
 {
     public class Skybox : IDisposable
     {
+        private const string texture0 = nameof(texture0);
+
         private readonly string[] textureLocations =
         {
             "Images/skybox/right.jpg",
@@ -108,6 +110,8 @@ namespace ZargoEngine.Rendering
             GL.DepthMask(false);
             
             skyBoxShader.Use();
+            skyBoxShader.SetInt(texture0, 0);
+
             skyBoxShader.SetMatrix4("projection", camera.GetProjectionMatrix());
             skyBoxShader.SetMatrix4("view", camera.GetViewMatrix());
             

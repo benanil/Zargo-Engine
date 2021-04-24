@@ -100,7 +100,7 @@ namespace ZargoEngine
             GL.Enable(EnableCap.DepthTest);
             GL.CullFace(CullFaceMode.Back);
             
-            skybox.Use(camera);
+            //skybox.Use(camera);
             
             SceneManager.currentScene?.Render();
             

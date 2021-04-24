@@ -40,7 +40,7 @@ namespace ZargoEngine.Rendering
             {
                 GL.GetShaderInfoLog(vertexID, out string infoLog);
                 Console.WriteLine(infoLog);
-                return;
+                throw new Exception("vertex shader failed");
             }
 
             int fragmentID = GL.CreateShader(ShaderType.FragmentShader);
@@ -56,7 +56,7 @@ namespace ZargoEngine.Rendering
             {
                 GL.GetShaderInfoLog(fragmentID, out string infoLog);
                 Console.WriteLine(infoLog);
-                return;
+                throw new Exception("fragment shader failed");
             }
 
             program = GL.CreateProgram();
@@ -73,7 +73,7 @@ namespace ZargoEngine.Rendering
             {
                 GL.GetShaderInfoLog(program, out string infoLog);
                 Console.WriteLine(infoLog);
-                return;
+                throw new Exception("linking shaders failed");
             }
 
             Console.WriteLine("Shader compiled sucsesfully");
@@ -136,10 +136,10 @@ namespace ZargoEngine.Rendering
             int location = GL.GetUniformLocation(program, name);
             GL.Uniform4(location, value);
         }
-        public void SetMatrix4(string name, Matrix4 value)
+        public void SetMatrix4(string name, Matrix4 value,bool transpose = true)
         {
             int location = GL.GetUniformLocation(program, name);
-            GL.UniformMatrix4(location, true, ref value);
+            GL.UniformMatrix4(location, transpose, ref value);
         }
         
         public static void SetInt(int location, int value)         => GL.Uniform1(location, value);

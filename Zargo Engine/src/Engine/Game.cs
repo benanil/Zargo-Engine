@@ -100,17 +100,13 @@ namespace ZargoEngine
             GL.Enable(EnableCap.DepthTest);
             GL.CullFace(CullFaceMode.Back);
             
+            skybox.Use(camera);
+            
             SceneManager.currentScene?.Render();
             
-            skybox.Use(camera);
-
             FrameBuffer.Unbind();
 
-            GameViewWindow.Render();
-
             EditorWindow();
-
-            _controller.Render();
 
             GL.Flush();
             SwapBuffers();
@@ -119,9 +115,11 @@ namespace ZargoEngine
 
         private void EditorWindow()
         {
+            GameViewWindow.Render();
             inspector.DrawGUI();
             hierarchy.DrawGUI();
             _controller.GenerateDockspace();
+            _controller.Render();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)

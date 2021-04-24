@@ -71,8 +71,6 @@ namespace Dear_ImGui_Sample
         
         public void GenerateDockspace()
         {
-            var io = ImGui.GetIO();
-
             ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero, ImGuiCond.Always);
 
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(Program.MainGame.ClientSize.X, Program.MainGame.ClientSize.Y));

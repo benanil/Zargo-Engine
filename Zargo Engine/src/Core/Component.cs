@@ -27,6 +27,8 @@ namespace ZargoEngine
             ImGui.TextColored(Color4.Orange.ToSystem(), name);
 
             SerializeFields();
+
+            ImGui.Separator();
         }
 
         private void SerializeFields()

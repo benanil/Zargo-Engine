@@ -7,5 +7,5 @@ uniform samplerCube texture0;
 
 void main()
 {
-    FragColor = texture(texture0, TexCoords);
+    FragColor = textureCube(texture0, TexCoords);
 }

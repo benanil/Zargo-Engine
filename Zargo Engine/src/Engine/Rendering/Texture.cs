@@ -31,7 +31,9 @@ namespace ZargoEngine.Rendering
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            
+
+            Debug.Log(GL.GetError());
+
             GL.GenerateTextureMipmap(texID);
         }
 

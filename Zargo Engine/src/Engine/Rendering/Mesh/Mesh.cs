@@ -109,14 +109,14 @@ namespace ZargoEngine.Rendering
             vaoID = GL.GenVertexArray();
             GL.BindVertexArray(vaoID);
 
-            Console.WriteLine(GL.GetError());
+            Debug.Log(GL.GetError());
 
             vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
             GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * Marshal.SizeOf<Vector3>(), Vertices.ToArray(), BufferUsageHint.DynamicDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf<Vector3>(), 0);
             
-            Console.WriteLine(GL.GetError());
+            Debug.Log(GL.GetError());
 
             eboID = GL.GenBuffer();
 
@@ -137,7 +137,7 @@ namespace ZargoEngine.Rendering
 
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
 
-            Console.WriteLine(GL.GetError());
+            Debug.Log(GL.GetError());
         }
 
         public Vector3[] GetPositions()

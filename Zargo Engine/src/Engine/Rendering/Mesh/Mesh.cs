@@ -6,71 +6,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using UkooLabs.FbxSharpie;
 
 namespace ZargoEngine.Rendering
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Vertex
-    {
-        public Vector3 position;
-        public Vector2 texCoord;
-        public Vector3 normal;
-
-        public Vertex(Vector3 position, Vector2 texCoord, Vector3 normal){
-            this.position = position;
-            this.texCoord = texCoord;
-            this.normal = normal;
-        }
-    }
-
     public class Mesh : IDisposable
     {
-        private readonly List<Tuple<Vertex, Vertex, Vertex>> faces = new List<Tuple<Vertex, Vertex, Vertex>>();
-
-        private Vector3[] _positions;
-        public Vector3[] Vertices{
-            get{
-                if (_positions == null){
-                    _positions = GetPositions();
-                }
-                return _positions;
-            }
-        }
-        private Vector2[] _texCoords;
-        public Vector2[] TexCoords
-        {
-            get{
-                if (_texCoords == null) _texCoords = GetTextureCoords();
-                return _texCoords;
-            }
-        }
-        private Vector3[] _normals;
-        public Vector3[] Normals
-        {
-            get
-            {
-                if (_normals == null) _normals = GetPositions();
-                return _normals;
-            }
-        }
-
-        private int[] _indices;
-        public int[] indices
-        {
-            get
-            {
-                if (_indices == null) _indices = GetIndices();
-                return _indices;
-            }
-        }
+        private SubMesh subMesh;
 
         private readonly int vaoID, vboID, eboID;
 
         // comining
         public Mesh(string path)
         {
-            ObjLoader.Load(path, ref faces);
+            if (path.EndsWith(".obj")){
+                List<Tuple<FbxVertex, FbxVertex, FbxVertex>> faces = new List<Tuple<FbxVertex, FbxVertex, FbxVertex>>();
+                ObjLoader.Load(path, ref faces);
+                subMesh = new ObjMesh(faces);
+            }
+            else if (path.EndsWith(".fbx")){
+                System.Numerics.Vector3[] positions = Array.Empty<System.Numerics.Vector3>();
+                System.Numerics.Vector3[] normals   = Array.Empty<System.Numerics.Vector3>();
+                System.Numerics.Vector2[] texCoords = Array.Empty<System.Numerics.Vector2>();
+                int[] indices = Array.Empty<int>();
+
+                FbxLoader.LoadFbx(path, ref positions, ref normals, ref texCoords,ref indices);
+                subMesh = new FbxMesh(positions, normals, texCoords,indices);
+            }
             LoadBuffers(ref vaoID,ref vboID,ref eboID);
+        }
+
+        // for custom mesh
+        public Mesh(System.Numerics.Vector3[] positions, System.Numerics.Vector3[] normals, System.Numerics.Vector2[] texcoords,int[] indices)
+        {
+            subMesh = new FbxMesh(positions,normals,texcoords,indices); 
+            LoadBuffers(ref vaoID, ref vboID, ref eboID);
         }
 
         public override string ToString()
@@ -78,26 +48,26 @@ namespace ZargoEngine.Rendering
             var name = new StringBuilder();
 
             name.Append("Vertices\n");
-            for (int i = 0; i < Vertices.Length; i++){
-                name.Append(Vertices[i]);
+            for (int i = 0; i < subMesh.Positions.Length; i++){
+                name.Append(subMesh.Positions[i]);
                 name.Append('\n');
             }
             
             name.Append("Texcoords\n");
 
-            for (int i = 0; i < Vertices.Length; i++){
-                name.Append(TexCoords[i]);
+            for (int i = 0; i < subMesh.Positions.Length; i++){
+                name.Append(subMesh.TexCoords[i]);
                 name.Append('\n');
             }
             
             name.Append("Normals\n");
-            for (int i = 0; i < Vertices.Length; i++){
-                name.Append(Normals[i]);
+            for (int i = 0; i < subMesh.Positions.Length; i++){
+                name.Append(subMesh.Normals[i]);
                 name.Append('\n');
             }
 
-            for (int i = 0; i < indices.Length; i += 3){
-                name.Append($"{indices[i]} {indices[i + 1]} {indices[i + 2]}");
+            for (int i = 0; i < subMesh.Indices.Length; i += 3){
+                name.Append($"{subMesh.Indices[i]} {subMesh.Indices[i + 1]} {subMesh.Indices[i + 2]}");
                 name.Append('\n');
             }
 
@@ -113,7 +83,7 @@ namespace ZargoEngine.Rendering
 
             vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
-            GL.BufferData(BufferTarget.ArrayBuffer, Vertices.Length * Marshal.SizeOf<Vector3>(), Vertices.ToArray(), BufferUsageHint.DynamicDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, subMesh.Positions.Length * Marshal.SizeOf<Vector3>(), subMesh.Positions.ToArray(), BufferUsageHint.DynamicDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf<Vector3>(), 0);
             
             Debug.Log(GL.GetError());
@@ -121,55 +91,26 @@ namespace ZargoEngine.Rendering
             eboID = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, eboID);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, subMesh.Indices.Length * sizeof(int), subMesh.Indices, BufferUsageHint.StaticDraw);
 
             var uvBuffer = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, uvBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, TexCoords.Length * Marshal.SizeOf<Vector2>(), TexCoords.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, subMesh.TexCoords.Length * Marshal.SizeOf<Vector2>(), subMesh.TexCoords.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
 
             var normalBuffer = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
-            GL.BufferData(BufferTarget.ArrayBuffer, Normals.Length * Marshal.SizeOf<Vector3>(), Normals.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, subMesh.Normals.Length * Marshal.SizeOf<Vector3>(), subMesh.Normals.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
 
             Debug.Log(GL.GetError());
         }
 
-        public Vector3[] GetPositions()
-        {
-            List<Vector3> coords = new List<Vector3>();
-
-            foreach (var face in faces){
-                coords.Add(face.Item1.position);
-                coords.Add(face.Item2.position);
-                coords.Add(face.Item3.position);
-            }
-
-            return coords.ToArray();
-        }
-
-        public Vector2[] GetTextureCoords(){
-            List<Vector2> coords = new List<Vector2>();
-
-            foreach (var face in faces){
-                coords.Add(face.Item1.texCoord);
-                coords.Add(face.Item2.texCoord);
-                coords.Add(face.Item3.texCoord);
-            }
-
-            return coords.ToArray();
-        }
-
-        public int[] GetIndices(int offset = 0)
-        {                                   // Indice count
-            return Enumerable.Range(offset, faces.Count * 3).ToArray();
-        }
-
+        
         public void Draw(){
             GL.BindVertexArray(vaoID);
             
@@ -177,7 +118,7 @@ namespace ZargoEngine.Rendering
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
 
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, subMesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
             
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);

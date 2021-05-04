@@ -49,7 +49,7 @@ namespace ZargoEngine
             camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");
 
-            var mesh = AssetManager.GetMesh("Models/Atilla.obj");
+            var mesh = AssetManager.GetMesh("Models/sword_make.fbx");
             //var mesh    = MeshCreator.CreateQuad();
             var shader  = AssetManager.GetShader("Shaders/BasicVert.hlsl", "Shaders/BasicFrag.hlsl");
             var texture = AssetManager.GetTexture("Images/hero texture.png");

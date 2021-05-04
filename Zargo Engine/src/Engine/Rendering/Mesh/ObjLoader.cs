@@ -4,12 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UkooLabs.FbxSharpie;
+using ZargoEngine.Helper;
 
 namespace ZargoEngine.Rendering
 {
     public static class ObjLoader
     {
-        public static void Load(string path, ref List<Tuple<Vertex,Vertex,Vertex>> faces)
+        public static void Load(string path, ref List<Tuple<FbxVertex, FbxVertex, FbxVertex>> faces)
         {
             List<string> lines = new List<string>(File.ReadAllText(path).Split('\n'));
 
@@ -167,8 +169,7 @@ namespace ZargoEngine.Rendering
                             faceInds.Add(face);
                         }
                     }
-                    else
-                    {
+                    else{
                         Debug.LogError($"Error parsing face: {line}");
                     }
                 }
@@ -176,11 +177,11 @@ namespace ZargoEngine.Rendering
 
             foreach (var face in faceInds)
             {
-                Vertex v1 = new (verts[face.Item1.Vertex],texs[face.Item1.Texcoord], normals[face.Item1.Normal]);
-                Vertex v2 = new (verts[face.Item2.Vertex],texs[face.Item2.Texcoord], normals[face.Item2.Normal]);
-                Vertex v3 = new (verts[face.Item3.Vertex],texs[face.Item3.Texcoord], normals[face.Item3.Normal]);
+                FbxVertex v1 = new FbxVertex(verts[face.Item1.Vertex].ToSystem(),texs[face.Item1.Texcoord].ToSystem(), normals[face.Item1.Normal].ToSystem(),Vector3.Zero.ToSystem(), Vector3.Zero.ToSystem());
+                FbxVertex v2 = new FbxVertex(verts[face.Item2.Vertex].ToSystem(),texs[face.Item2.Texcoord].ToSystem(), normals[face.Item2.Normal].ToSystem(),Vector3.Zero.ToSystem(), Vector3.Zero.ToSystem());
+                FbxVertex v3 = new FbxVertex(verts[face.Item3.Vertex].ToSystem(),texs[face.Item3.Texcoord].ToSystem(), normals[face.Item3.Normal].ToSystem(),Vector3.Zero.ToSystem(), Vector3.Zero.ToSystem());
 
-                faces.Add(new Tuple<Vertex, Vertex, Vertex>(v1, v2, v3));
+                faces.Add(new Tuple<FbxVertex, FbxVertex, FbxVertex>(v1, v2, v3));
             }
         }
 

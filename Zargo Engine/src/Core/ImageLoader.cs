@@ -2,7 +2,6 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using System;
 using System.Collections.Generic;
 using ZargoEngine.AssetManagement;
 
@@ -55,10 +54,10 @@ namespace ZargoEngine
 
                 for (int x = 0; x < image.Width; x++)
                 {
-                    pixels.Add(Math.Max((byte)(row[x].R * .5f), (byte)0));
-                    pixels.Add(Math.Max((byte)(row[x].G * .5f), (byte)0));
-                    pixels.Add(Math.Max((byte)(row[x].B * .5f), (byte)0));
-                    pixels.Add(Math.Max((byte)(row[x].A * .5f), (byte)0));
+                    pixels.Add(row[x].R);
+                    pixels.Add(row[x].G);
+                    pixels.Add(row[x].B);
+                    pixels.Add(row[x].A);
                 }
             }
             return pixels.ToArray();
@@ -81,8 +80,7 @@ namespace ZargoEngine
             {
                 var row = image.GetPixelRowSpan(y);
 
-                for (int x = 0; x < image.Width; x++)
-                {
+                for (int x = 0; x < image.Width; x++){
                     pixels.Add(row[x].R);
                     pixels.Add(row[x].G);
                     pixels.Add(row[x].B);

@@ -1,11 +1,37 @@
 ﻿
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ZargoEngine
 {
     public static class JsonManager
     {
+        [Serializable]
+        public struct ArrayHolder<T>
+        {
+            public T[] Data;
+
+            public ArrayHolder(T[] data){
+                Data = data;
+            }
+        }
+
+        public static void EnsurePath(string suredPath,string targetPath)
+        {
+            string currentPath = suredPath;
+
+            Queue<string> targetPaths = new Queue<string>(targetPath.Split('/'));
+            currentPath += targetPaths.Dequeue();
+
+            while (!Path.HasExtension(currentPath))
+            {
+                Directory.CreateDirectory(currentPath);
+                currentPath += targetPaths.Dequeue();
+            }
+        }
+
         public static void Save<T>(this T obj, string file)
         {
             if (!File.Exists(file)){
@@ -26,7 +52,8 @@ namespace ZargoEngine
                 return;
             }
 
-            string saveTxt = JsonConvert.SerializeObject(obj);
+            var convertedObj = new ArrayHolder<T>(obj);
+            string saveTxt = JsonConvert.SerializeObject(convertedObj);
 
             using StreamWriter writer = new StreamWriter(file);
             writer.Write(saveTxt);
@@ -56,7 +83,7 @@ namespace ZargoEngine
             using StreamReader reader = new StreamReader(file);
             string convertedTxt = reader.ReadToEnd();
 
-            return JsonConvert.DeserializeObject<T>(convertedTxt) as T[];
+            return JsonConvert.DeserializeObject<ArrayHolder<T>>(convertedTxt).Data;
         }
     }
 }

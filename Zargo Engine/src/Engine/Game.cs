@@ -18,13 +18,14 @@ namespace ZargoEngine
     {
         private ImGuiController _controller;
         private Camera camera;
+
         private Inspector inspector;
         private Hierarchy hierarchy;
-        private GameObject firstObject;
+        private GameViewWindow GameViewWindow;
+        
+        public GameObject firstObject;
 
         private FrameBuffer frameBuffer;
-
-        private GameViewWindow GameViewWindow;
 
         private Skybox skybox;
 
@@ -36,7 +37,7 @@ namespace ZargoEngine
         protected override void OnLoad()
         {
             base.OnLoad();
-            GL.ClearColor(Color4.Bisque);
+            GL.ClearColor(Color4.Gray);
 
             LoadScene();
             LoadGUI();
@@ -49,9 +50,9 @@ namespace ZargoEngine
             camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");
 
-            var mesh = AssetManager.GetMesh("Models/sword_make.fbx");
+            var mesh = AssetManager.GetMesh("Models/Atilla.obj");
             //var mesh    = MeshCreator.CreateQuad();
-            var shader  = AssetManager.GetShader("Shaders/BasicVert.hlsl", "Shaders/BasicFrag.hlsl");
+            var shader  = AssetManager.GetShader("Shaders/BasicVert.glsl", "Shaders/BasicFrag.glsl");
             var texture = AssetManager.GetTexture("Images/hero texture.png");
 
             firstObject = new GameObject("first Obj");
@@ -59,8 +60,14 @@ namespace ZargoEngine
 
             firstObject.AddComponent(new FirstBehaviour());
 
-            scene.AddMeshRenderer(new MeshRenderer(mesh, shader, firstObject, ref texture));
+            var meshrenderer = new MeshRenderer(mesh, shader, firstObject, ref texture);
+
+            firstObject.AddComponent(meshrenderer);
+
+            scene.AddMeshRenderer(meshrenderer);
             scene.AddGameObject(firstObject);
+
+            scene.AddGameObject(new GameObject("secondObj"));
 
             SceneManager.AddScene(scene);
             SceneManager.LoadScene(0);
@@ -76,19 +83,13 @@ namespace ZargoEngine
 
             inspector.currentObject = firstObject;
 
-            var hierarchyMenu1 = new Menu("deneme");
-            var hierarchyMenu2 = new Menu("deneme2");
-            
-            hierarchyMenu1.AddMenuItem(new MenuItem("denemeler"));
-            hierarchyMenu2.AddMenuItem(new MenuItem("denesene"));
-            
-            hierarchy.AddMenuItem(hierarchyMenu1);
-            hierarchy.AddMenuItem(hierarchyMenu2);
+            ImGuiController.DarkTheme();
 
+            /*
             Debug.Log("hour: " + DateTime.Now.Hour);
-            
             if (DateTime.Now.Hour > 16 || DateTime.Now.Hour < 5) ImGuiController.DarkTheme();
             else ImGui.StyleColorsLight();
+            */
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -106,20 +107,21 @@ namespace ZargoEngine
             
             FrameBuffer.Unbind();
 
-            EditorWindow();
+           // EditorWindow();
+
+            _controller.GenerateDockspace(EditorWindow);
+            _controller.Render();
 
             GL.Flush();
             SwapBuffers();
             base.OnRenderFrame(args);
         }
 
-        private void EditorWindow()
+        public void EditorWindow()
         {
             GameViewWindow.Render();
             inspector.DrawGUI();
             hierarchy.DrawGUI();
-            _controller.GenerateDockspace();
-            _controller.Render();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)

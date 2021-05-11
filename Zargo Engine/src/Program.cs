@@ -1,6 +1,6 @@
 ﻿
 using OpenTK.Windowing.Desktop;
-using System;
+using System.Diagnostics;
 
 namespace ZargoEngine
 {
@@ -8,12 +8,13 @@ namespace ZargoEngine
     {
         public static Game MainGame;
 
-        [STAThread]
         private static void Main(string[] args)
         {
             //Convert ImageSharp's format into a byte array, so we can use it with OpenGL.
             var pixels = ImageLoader.Load("/Images/Engine icon.png",out int width,out int height);
-            
+
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
             GameWindowSettings gameWindowSettings = new GameWindowSettings();
 
             NativeWindowSettings nativeWindowSettings = new NativeWindowSettings(){

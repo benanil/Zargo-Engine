@@ -1,8 +1,10 @@
 ﻿using ImGuiNET;
 using System.Numerics;
 using System;
-using System.Runtime.InteropServices;
-using OpenTK.Graphics.OpenGL4;
+using ImGuizmoNET;
+using ZargoEngine.Rendering;
+using Dear_ImGui_Sample;
+using System.Threading;
 
 namespace ZargoEngine.Editor
 {
@@ -29,7 +31,19 @@ namespace ZargoEngine.Editor
             ImGui.SetCursorPos(windowPos);
 
             ImGui.Image((IntPtr)textureID, windowSize, new Vector2(0, 1), new Vector2(1, 0));
-
+            /*
+            var entity = Program.MainGame.firstObject;
+            
+            if (entity != null)
+            {
+                ImGuizmo.SetOrthographic(false);
+                ImGuizmo.SetDrawlist();
+                ImGuizmo.SetRect(ImGui.GetWindowPos().X, ImGui.GetWindowPos().Y, ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
+            
+                ImGuizmo.Manipulate(ref Camera.main.ViewMatrix.Row0.X, ref Camera.main.projectionMatrix.Row0.X,OPERATION.TRANSLATE,
+                                    MODE.LOCAL,ref entity.transform.Translation.Row0.X);
+            }
+            */
             ImGui.End();
         }
 

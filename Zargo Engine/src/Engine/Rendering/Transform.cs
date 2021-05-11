@@ -15,6 +15,8 @@ namespace ZargoEngine.Rendering
 
         public float scale = 5f;
 
+        public Matrix4 Translation;
+
         public override void DrawGUI()
         {
             base.DrawGUI();
@@ -25,6 +27,7 @@ namespace ZargoEngine.Rendering
         public Transform(GameObject gameObject,Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)
         {
             name = "Transform";
+            Translation = GetTranslation();
             gameObject.AddComponent(this);
             this.gameObject = gameObject;
             this.position = position;

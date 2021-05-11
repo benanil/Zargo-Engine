@@ -12,8 +12,8 @@ namespace ZargoEngine
         public string name;
         public Camera camera;
 
-        private List<GameObject> gameObjects = new List<GameObject>();
-        private List<MeshRenderer> meshRenderers = new List<MeshRenderer>();
+        public List<GameObject> gameObjects = new List<GameObject>();
+        public List<MeshRenderer> meshRenderers = new List<MeshRenderer>();
 
         private bool started;
         private Vector2 mouseOldPos;

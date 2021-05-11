@@ -5,7 +5,7 @@ using ZargoEngine.Rendering;
 
 namespace ZargoEngine
 {
-    public class GameObject : Component
+    public class GameObject : Component, IDisposable 
     {
         public Transform _transform;
         public Transform transform
@@ -57,9 +57,32 @@ namespace ZargoEngine
             return component;
         }
 
+        public T GetComponent<T>() where T : Component
+        {
+            return behaviours.Find(x => x.GetType() is T) as T;
+        }
+
+        public bool TryGetComponent<T>(out T value) where T : Component
+        {
+            value = behaviours.Find(x => x.GetType() is T) as T;
+            return value != null;
+        }
+
         public Component GetComponent(Type type)
         {
             return behaviours.Find(x => x.GetType() == type);
+        }
+
+        public void Dispose()
+        {
+            SceneManager.currentScene.gameObjects.Remove(this);
+
+            if (TryGetComponent(out MeshRenderer meshRenderer)){
+                SceneManager.currentScene.meshRenderers.Remove(meshRenderer);
+                meshRenderer.Dispose();
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

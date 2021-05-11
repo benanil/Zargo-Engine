@@ -22,9 +22,9 @@ namespace ZargoEngine.Rendering
 
             foreach (var face in faces)
             {
-                coords.Add(face.Item1.Position.ToOpenTk());
-                coords.Add(face.Item2.Position.ToOpenTk());
-                coords.Add(face.Item3.Position.ToOpenTk());
+                coords.Add(face.Item1.Position.ToOpenTK());
+                coords.Add(face.Item2.Position.ToOpenTK());
+                coords.Add(face.Item3.Position.ToOpenTK());
             }
 
             return coords.ToArray();
@@ -36,9 +36,9 @@ namespace ZargoEngine.Rendering
 
             foreach (var face in faces)
             {
-                coords.Add(face.Item1.TexCoord.ToOpenTk());
-                coords.Add(face.Item2.TexCoord.ToOpenTk());
-                coords.Add(face.Item3.TexCoord.ToOpenTk());
+                coords.Add(face.Item1.TexCoord.ToOpenTK());
+                coords.Add(face.Item2.TexCoord.ToOpenTK());
+                coords.Add(face.Item3.TexCoord.ToOpenTK());
             }
 
             return coords.ToArray();

@@ -8,6 +8,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ZargoEngine.Helper;
 using ZargoEngine;
+using ImGuizmoNET;
 
 namespace Dear_ImGui_Sample
 {
@@ -17,6 +18,7 @@ namespace Dear_ImGui_Sample
     /// </summary>
     public class ImGuiController : IDisposable
     {
+        public static ImGuiController instance;
         private bool _frameBegun;
 
         private int _vertexArray;
@@ -38,11 +40,13 @@ namespace Dear_ImGui_Sample
         /// </summary>
         public ImGuiController(int width, int height)
         {
+            instance = this;
             _windowWidth = width;
             _windowHeight = height;
 
             IntPtr context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
+
             var io = ImGui.GetIO();
             io.Fonts.AddFontDefault();
 
@@ -61,26 +65,59 @@ namespace Dear_ImGui_Sample
             SetPerFrameImGuiData(1f / 60f);
 
             ImGui.NewFrame();
+
+            //ImGuizmo.SetImGuiContext(context);
+            //
+            //ImGuizmo.BeginFrame();
+
             _frameBegun = true;
         }
 
-        private bool dockOpen;
+        private bool dockOpen = true;
+        ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None;
 
-        private const ImGuiWindowFlags windowFlags =  ImGuiWindowFlags.NoTitleBar |  ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | 
-                                                      ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
-        
-        public void GenerateDockspace()
+        public unsafe void GenerateDockspace(in Action editorWindow)
         {
-            ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero, ImGuiCond.Always);
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking; 
 
+            var viewportPtr = ImGui.GetMainViewport();
+
+            ImGui.SetNextWindowPos(System.Numerics.Vector2.Zero, ImGuiCond.Always);
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(Program.MainGame.ClientSize.X, Program.MainGame.ClientSize.Y));
+
+            ImGui.SetNextWindowViewport(viewportPtr.ID);
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
 
-            ImGui.Begin("Dockspace Demo", ref dockOpen, windowFlags);
+            windowFlags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
+
+            ImGui.Begin("Dockspace Demo", ref dockOpen,windowFlags);
 
             ImGui.PopStyleVar(2);
+
+            ImGui.DockSpace(ImGui.GetID("Dockspace"), System.Numerics.Vector2.Zero,dockspace_flags);
+
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.BeginMenu("File"))
+                {
+                    ImGui.Separator();
+
+                    if (ImGui.MenuItem("Save")) { }
+                    if (ImGui.MenuItem("Load")) { }
+                    if (ImGui.MenuItem("Exit"))
+                    {
+                        Program.MainGame.Close();
+                    }
+
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
+            
+            editorWindow();
 
             ImGui.End();
         }
@@ -176,7 +213,7 @@ namespace Dear_ImGui_Sample
 
             io.Fonts.ClearTexData();
 
-           RedStyle();    
+           // RedStyle();    
         }
 
         public static void RedStyle()

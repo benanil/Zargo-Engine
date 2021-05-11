@@ -12,6 +12,7 @@ namespace ZargoEngine.Rendering
     // Check out the web version if you don't know why we are doing a specific thing or want to know more about the code
     public class Camera
     {
+        public static Camera main;
         // Those vectors are directions pointing outwards from the camera to define how it rotated
         private Vector3 _front = -Vector3.UnitZ;
 
@@ -33,6 +34,7 @@ namespace ZargoEngine.Rendering
             _front = front;
             Position = position;
             AspectRatio = aspectRatio;
+            main = this;
         }
 
         // The position of the camera
@@ -86,17 +88,20 @@ namespace ZargoEngine.Rendering
             }
         }
 
+        public Matrix4 ViewMatrix;
+
         // Get the view matrix using the amazing LookAt function described more in depth on the web tutorials
         public Matrix4 GetViewMatrix()
         {
-            return Matrix4.LookAt(Position, Position + _front, _up);
+            return ViewMatrix;
         }
+
+        public Matrix4 projectionMatrix;
 
         // Get the projection matrix using the same method we have used up until this point
         public Matrix4 GetProjectionMatrix()
         {
-            return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 1000f);
-            //return Matrix4.CreateOrthographic(5, 5, 0.01f, 100f);
+            return projectionMatrix;
         }
 
         // This function is going to update the direction vertices using some of the math learned in the web tutorials
@@ -115,6 +120,9 @@ namespace ZargoEngine.Rendering
             // not be what you need for all cameras so keep this in mind if you do not want a FPS camera
             _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
             _up = Vector3.Normalize(Vector3.Cross(_right, _front));
+
+            projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 1000f);
+            ViewMatrix = Matrix4.LookAt(Position, Position + _front, _up);
         }
     }
 }

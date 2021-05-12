@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IO;
 using ZargoEngine.Core;
 using ZargoEngine.Rendering;
 
@@ -50,6 +51,18 @@ namespace ZargoEngine.AssetManagement
             instance.meshes.Add(path, mesh);
 
             return mesh;
+        }
+
+        public static bool GetFileLocation(ref string path)
+        {
+            path = AssetsPath + path;
+            string realFile = Directory.GetCurrentDirectory() + "\\" + path;
+            if (!File.Exists(realFile)){
+                Debug.LogError("sound file is not exist:");
+                Debug.LogError(realFile);
+                return false;
+            }
+            return true;
         }
 
         public void Dispose()

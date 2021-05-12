@@ -9,6 +9,8 @@ using ZargoEngine.AssetManagement;
 using ZargoEngine.Rendering;
 using ZargoEngine.Editor;
 using Dear_ImGui_Sample;
+using ImGuiNET;
+using ZargoEngine.SaveLoad;
 
 namespace ZargoEngine
 {
@@ -135,6 +137,7 @@ namespace ZargoEngine
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
+            ImGui.SetScrollY(e.OffsetY);
             base.OnMouseWheel(e);
         }
 
@@ -164,23 +167,6 @@ namespace ZargoEngine
 
         public float AspectRatio()
         {
-#if Editor
-            if (GameViewWindow.Scale.X > 0 && GameViewWindow.Scale.Y > 0)
-            {
-                lastAspectRatio = GameViewWindow.Scale.X / GameViewWindow.Scale.Y;
-                //if (GameViewWindow.Scale.X > GameViewWindow.Scale.Y){
-                //    lastAspectRatio = GameViewWindow.Scale.X / GameViewWindow.Scale.Y;
-                //}
-                //else{
-                //    lastAspectRatio = GameViewWindow.Scale.Y / GameViewWindow.Scale.X;
-                //}
-                return lastAspectRatio;
-            }
-            else
-            {
-                return lastAspectRatio;
-            }
-#else
             if (ClientRectangle.Size.X > 0 && ClientRectangle.Size.Y > 0){
                 lastAspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
                 return lastAspectRatio;
@@ -188,12 +174,37 @@ namespace ZargoEngine
             else{
                 return lastAspectRatio;
             }
-#endif
         }
 
-        private void LogGame()
+        public static void SaveScene()
+        { 
+            Debug.Log("player prefs saving");
+
+            PlayerPrefs.SetInt("meymun", 3);
+            PlayerPrefs.SetBool("is sick", false);
+            PlayerPrefs.SetFloat("new float value", 1.5f);
+
+            Debug.Log("saved");
+        }
+
+        private void LoadNewScene()
         {
 
+        }
+
+        public static void LogGame()
+        {
+            if (PlayerPrefs.TryGetInt("meymun", out int intResult)){
+                Debug.Log("int getted result: " + intResult);
+            }
+
+            if (PlayerPrefs.TryGetFloat("new float value", out float floatResult)){
+                Debug.Log("float getted result: " + floatResult);
+            }
+
+            if (PlayerPrefs.TryGetBool("is sick", out bool boolResult)){
+                Debug.Log("bool getted result: " + boolResult);
+            }
         }
 
         protected override void OnClosed()

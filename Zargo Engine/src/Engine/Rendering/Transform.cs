@@ -23,7 +23,7 @@ namespace ZargoEngine.Rendering
         public override void DrawGUI()
         {
             ImGui.TextColored(Color4.Orange.ToSystem(), name);
-            SerializeFields();
+            SerializeComponent();
             ImGui.DragFloat3("Euler Angles",ref _eulerAngels);
             eulerAngels = _eulerAngels.V3DegreToRadian();
             ImGui.Separator();

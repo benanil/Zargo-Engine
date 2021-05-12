@@ -28,12 +28,37 @@ namespace ZargoEngine
         {
             ImGui.TextColored(Color4.Orange.ToSystem(), name);
             
-            SerializeFields();
+            SerializeComponent();
 
             ImGui.Separator();
         }
 
-        protected void SerializeFields()
+        protected void SerializeComponent()
+        {
+            SerializeFields();
+            SerializeMethods();
+        }
+
+        private void SerializeMethods()
+        {
+            var Methods = this.GetType().GetMethods();
+
+            for (int i = 0; i < Methods.Length; i++)
+            {
+                foreach(var item in Methods[i].GetCustomAttributes())
+                {
+                    if (item is ButtonAttribute button)
+                    {
+                        if (ImGui.Button(Methods[i].Name, button.size))
+                        {
+                            Methods[i].Invoke(this,null);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SerializeFields()
         {
             FieldInfo[] fields = this.GetType().GetFields();
 
@@ -56,7 +81,8 @@ namespace ZargoEngine
 
                     if (attributes.Any(x =>
                     {
-                        if (x.GetType() == typeof(DragAttribute)){
+                        if (x.GetType() == typeof(DragAttribute))
+                        {
                             dragAttribute = (DragAttribute)x;
                             return true;
                         }
@@ -89,7 +115,8 @@ namespace ZargoEngine
 
                     if (attributes.Any(x =>
                     {
-                        if (x.GetType() == typeof(SliderAttribute)){
+                        if (x.GetType() == typeof(SliderAttribute))
+                        {
                             sliderAttribute = (SliderAttribute)x;
                             return true;
                         }
@@ -122,7 +149,8 @@ namespace ZargoEngine
 
                     if (attributes.Any(x =>
                     {
-                        if (x.GetType() == typeof(InputAttribute)){
+                        if (x.GetType() == typeof(InputAttribute))
+                        {
                             inputAttribute = (InputAttribute)x;
                             return true;
                         }
@@ -153,7 +181,7 @@ namespace ZargoEngine
                         }
                     }
                 }
-                
+
                 // drag input slider
 
                 switch (value)

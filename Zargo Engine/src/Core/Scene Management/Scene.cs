@@ -4,7 +4,6 @@ using ZargoEngine.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ZargoEngine.Bindings;
-using OpenTK.Windowing.Desktop;
 using ZargoEngine.Editor;
 
 namespace ZargoEngine

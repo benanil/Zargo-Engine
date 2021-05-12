@@ -39,9 +39,6 @@ namespace ZargoEngine.Rendering
         public override void DrawGUI()
         {
             // comining
-            ImGui.Text("name");
-            ImGui.SameLine();
-            ImGui.Text(mesh.name);
         }
 
         public void Render(in Camera camera)

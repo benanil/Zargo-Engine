@@ -8,6 +8,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ZargoEngine.Helper;
 using ZargoEngine;
+using ZargoEngine.SaveLoad;
 
 namespace Dear_ImGui_Sample
 {
@@ -106,12 +107,36 @@ namespace Dear_ImGui_Sample
                 {
                     ImGui.Separator();
 
-                    if (ImGui.MenuItem("Save")) { }
-                    if (ImGui.MenuItem("Load")) { }
-                    if (ImGui.MenuItem("Exit"))
-                    {
+                    if (ImGui.MenuItem("Save")) {
+                        Game.SaveScene();
+                    }
+
+                    if (ImGui.MenuItem("Load")) {
+                        Game.LogGame();
+                    }
+
+                    if (ImGui.MenuItem("Clear All Player Prefs")){
+                        PlayerPrefs.ClearAllPlayerPrefs();
+                    }
+
+                    if (ImGui.MenuItem("Exit")){
                         Program.MainGame.Close();
                     }
+
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMenuBar();
+            }
+
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.BeginMenu("Edit"))
+                {
+                    ImGui.Separator();
+
+                    if (ImGui.MenuItem("White Theme")) { ImGui.StyleColorsLight(); }
+                    if (ImGui.MenuItem("Dark Theme"))  { DarkTheme(); }
+                    if (ImGui.MenuItem("Red Theme"))   { RedStyle(); }
 
                     ImGui.EndMenu();
                 }
@@ -406,10 +431,6 @@ namespace Dear_ImGui_Sample
                     continue;
                 }
                 io.KeysDown[(int)key] = KeyboardState.IsKeyDown(key);
-                if (KeyboardState.IsKeyDown(key))
-                {
-                    Debug.Log("key name: " + Enum.GetName(typeof(Keys),key));
-                }
             }
 
             foreach (var c in PressedChars)

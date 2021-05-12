@@ -5,6 +5,7 @@ using System.Reflection;
 using ZargoEngine.Helper;
 using ZargoEngine.Editor;
 using ImGuiNET;
+using ZargoEngine.Rendering;
 
 namespace ZargoEngine
 {
@@ -32,7 +33,7 @@ namespace ZargoEngine
             ImGui.Separator();
         }
 
-        private void SerializeFields()
+        protected void SerializeFields()
         {
             FieldInfo[] fields = this.GetType().GetFields();
 
@@ -40,6 +41,8 @@ namespace ZargoEngine
             {
                 var field = fields[i];
                 var value = field.GetValue(this);
+
+                if (value is MeshRenderer) return;
 
                 var attributes = field.GetCustomAttributes().ToArray();
 

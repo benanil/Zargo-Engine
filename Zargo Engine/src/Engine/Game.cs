@@ -1,4 +1,4 @@
-﻿
+﻿#define Editor
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -9,8 +9,6 @@ using ZargoEngine.AssetManagement;
 using ZargoEngine.Rendering;
 using ZargoEngine.Editor;
 using Dear_ImGui_Sample;
-using System;
-using ImGuiNET;
 
 namespace ZargoEngine
 {
@@ -25,7 +23,7 @@ namespace ZargoEngine
         
         public GameObject firstObject;
 
-        private FrameBuffer frameBuffer;
+        public FrameBuffer frameBuffer;
 
         private Skybox skybox;
 
@@ -153,7 +151,6 @@ namespace ZargoEngine
 
         private void MainInput()
         {
-            CursorVisible = !IsMouseButtonDown(MouseButton.Right);
             if (IsKeyReleased(Keys.Enter) || IsKeyReleased(Keys.KeyPadEnter)) LogGame();
             if (IsKeyPressed(Keys.Escape)) Close();
         }
@@ -167,6 +164,23 @@ namespace ZargoEngine
 
         public float AspectRatio()
         {
+#if Editor
+            if (GameViewWindow.Scale.X > 0 && GameViewWindow.Scale.Y > 0)
+            {
+                lastAspectRatio = GameViewWindow.Scale.X / GameViewWindow.Scale.Y;
+                //if (GameViewWindow.Scale.X > GameViewWindow.Scale.Y){
+                //    lastAspectRatio = GameViewWindow.Scale.X / GameViewWindow.Scale.Y;
+                //}
+                //else{
+                //    lastAspectRatio = GameViewWindow.Scale.Y / GameViewWindow.Scale.X;
+                //}
+                return lastAspectRatio;
+            }
+            else
+            {
+                return lastAspectRatio;
+            }
+#else
             if (ClientRectangle.Size.X > 0 && ClientRectangle.Size.Y > 0){
                 lastAspectRatio = ClientRectangle.Size.X / ClientRectangle.Size.Y;
                 return lastAspectRatio;
@@ -174,6 +188,7 @@ namespace ZargoEngine
             else{
                 return lastAspectRatio;
             }
+#endif
         }
 
         private void LogGame()
@@ -186,7 +201,6 @@ namespace ZargoEngine
             SceneManager.Dispose();
             AssetManager.instance.Dispose();
             CursorVisible = true;
-            Close();
             base.OnClosed();
         }
 

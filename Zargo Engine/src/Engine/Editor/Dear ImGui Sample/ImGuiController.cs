@@ -8,7 +8,6 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ZargoEngine.Helper;
 using ZargoEngine;
-using ImGuizmoNET;
 
 namespace Dear_ImGui_Sample
 {
@@ -48,10 +47,12 @@ namespace Dear_ImGui_Sample
             ImGui.SetCurrentContext(context);
 
             var io = ImGui.GetIO();
+            
             io.Fonts.AddFontDefault();
 
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
             io.BackendFlags |= ImGuiBackendFlags.HasMouseCursors;
+
             io.ConfigFlags  |= ImGuiConfigFlags.DockingEnable;
             io.ConfigFlags  |= ImGuiConfigFlags.ViewportsEnable;
 
@@ -91,7 +92,7 @@ namespace Dear_ImGui_Sample
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
 
             windowFlags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
 
             ImGui.Begin("Dockspace Demo", ref dockOpen,windowFlags);
 
@@ -116,7 +117,7 @@ namespace Dear_ImGui_Sample
                 }
                 ImGui.EndMenuBar();
             }
-            
+
             editorWindow();
 
             ImGui.End();
@@ -200,9 +201,10 @@ namespace Dear_ImGui_Sample
         /// <summary>
         /// Recreates the device texture used to render text.
         /// </summary>
-        public void RecreateFontDeviceTexture()
+        public unsafe void RecreateFontDeviceTexture()
         {
             ImGuiIOPtr io = ImGui.GetIO();
+
             io.Fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
 
             _fontTexture = new Texture("ImGui Text Atlas", width, height, pixels);
@@ -213,7 +215,7 @@ namespace Dear_ImGui_Sample
 
             io.Fonts.ClearTexData();
 
-           // RedStyle();    
+            // RedStyle();    
         }
 
         public static void RedStyle()
@@ -404,6 +406,10 @@ namespace Dear_ImGui_Sample
                     continue;
                 }
                 io.KeysDown[(int)key] = KeyboardState.IsKeyDown(key);
+                if (KeyboardState.IsKeyDown(key))
+                {
+                    Debug.Log("key name: " + Enum.GetName(typeof(Keys),key));
+                }
             }
 
             foreach (var c in PressedChars)

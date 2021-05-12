@@ -12,13 +12,17 @@ namespace ZargoEngine.Rendering
 {
     public class Mesh : IDisposable
     {
-        private SubMesh subMesh;
+        public SubMesh subMesh;
 
         private readonly int vaoID, vboID, eboID;
+
+        public readonly string name;
 
         // comining
         public Mesh(string path)
         {
+            name = path.Split('/').Last();
+
             if (path.EndsWith(".obj")){
                 List<Tuple<FbxVertex, FbxVertex, FbxVertex>> faces = new List<Tuple<FbxVertex, FbxVertex, FbxVertex>>();
                 ObjLoader.Load(path, ref faces);

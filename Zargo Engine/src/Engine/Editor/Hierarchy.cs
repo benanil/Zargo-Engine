@@ -1,6 +1,5 @@
 ﻿
 using ImGuiNET;
-using System;
 
 namespace ZargoEngine.Editor
 {
@@ -20,15 +19,17 @@ namespace ZargoEngine.Editor
                 DrawEntity(x);
             });
 
-            deletedObject?.Dispose();
+            //deletedObject?.Dispose();
             ImGui.End();
         }
 
-        GameObject deletedObject;
+        //GameObject deletedObject;
+
+        //private readonly Debug.SlowDebugger slowDebugger = new Debug.SlowDebugger(1f);
 
         private  void DrawEntity(GameObject entity)
         {
-            var flags = (Inspector.instance.currentObject == entity) ? ImGuiTreeNodeFlags.OpenOnArrow : 0 | ImGuiTreeNodeFlags.Selected;
+            var flags = (Inspector.instance.currentObject != entity) ? ImGuiTreeNodeFlags.OpenOnArrow : 0 | ImGuiTreeNodeFlags.Selected;
             bool opened = ImGui.TreeNodeEx(entity.name, flags);
             
             if (ImGui.IsItemClicked()){
@@ -42,10 +43,12 @@ namespace ZargoEngine.Editor
             if (ImGui.BeginPopupContextWindow())
             {
                 if (ImGui.MenuItem("Delete")){
-                    deletedObject = entity;
+                    Debug.LogError("delete clicked: " + entity.name);
                 }
                 ImGui.EndPopup();
             }
+
+           // slowDebugger.LogSlow("drawing entity: " + entity.name);
         }
     }
 }

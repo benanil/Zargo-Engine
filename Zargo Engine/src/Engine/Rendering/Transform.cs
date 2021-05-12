@@ -2,6 +2,7 @@
 using ImGuiNET;
 using OpenTK.Mathematics;
 using ZargoEngine.Helper;
+using ZargoEngine.Mathmatics;
 
 namespace ZargoEngine.Rendering
 {
@@ -11,6 +12,8 @@ namespace ZargoEngine.Rendering
 
         public Vector3 position = Vector3.Zero;
 
+        private System.Numerics.Vector3 _eulerAngels = new System.Numerics.Vector3(90,0,0);
+
         private System.Numerics.Vector3 eulerAngels;
 
         public float scale = 5f;
@@ -19,9 +22,11 @@ namespace ZargoEngine.Rendering
 
         public override void DrawGUI()
         {
-            base.DrawGUI();
-
-            ImGui.DragFloat3("sdfsdf",ref eulerAngels);
+            ImGui.TextColored(Color4.Orange.ToSystem(), name);
+            SerializeFields();
+            ImGui.DragFloat3("Euler Angles",ref _eulerAngels);
+            eulerAngels = _eulerAngels.V3DegreToRadian();
+            ImGui.Separator();
         }
 
         public Transform(GameObject gameObject,Vector3 position = new Vector3(), Vector3 rotation = new Vector3(), float scale = 1)

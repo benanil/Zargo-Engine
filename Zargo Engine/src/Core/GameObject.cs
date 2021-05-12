@@ -78,6 +78,7 @@ namespace ZargoEngine
             SceneManager.currentScene.gameObjects.Remove(this);
 
             if (TryGetComponent(out MeshRenderer meshRenderer)){
+                Debug.LogError("MeshDisposing");
                 SceneManager.currentScene.meshRenderers.Remove(meshRenderer);
                 meshRenderer.Dispose();
             }

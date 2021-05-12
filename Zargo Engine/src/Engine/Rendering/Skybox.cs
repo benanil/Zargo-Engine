@@ -71,7 +71,7 @@ namespace ZargoEngine.Rendering
 
         public Skybox()
         {
-            skyBoxShader = AssetManager.GetShader("Shaders/Skybox/SkyboxVert.hlsl", "Shaders/Skybox/SkyboxFrag.hlsl");
+            skyBoxShader = AssetManager.GetShader("Shaders/Skybox/SkyboxVert.glsl", "Shaders/Skybox/SkyboxFrag.glsl");
             cubeMap = new CubeMap(textureLocations);
 
             vaoID = GL.GenVertexArray();

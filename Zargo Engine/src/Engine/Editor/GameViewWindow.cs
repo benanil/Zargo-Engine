@@ -1,23 +1,65 @@
 ﻿using ImGuiNET;
 using System.Numerics;
 using System;
-using ImGuizmoNET;
-using ZargoEngine.Rendering;
-using Dear_ImGui_Sample;
-using System.Threading;
 
 namespace ZargoEngine.Editor
 {
-    public class GameViewWindow
+    public class GameViewWindow 
     {
         private bool isOpen = true;
 
         private Game window;
 
+        private bool _hovered;
+        public bool Hovered{
+            get{
+                return _hovered;
+            }
+            private set{
+                _hovered = value;
+            }
+        }
+
+        private bool _focused;
+        public bool Focused
+        {
+            get{
+                return _focused;
+            }
+            private set{
+                _focused = value;
+            }
+        }
+
+        private OpenTK.Mathematics.Vector2i _scale;
+        public OpenTK.Mathematics.Vector2i Scale{
+            get{
+                return _scale;
+            }
+            set{
+                // value changed
+                if (value != _scale && Scale != OpenTK.Mathematics.Vector2i.Zero && Scale.X != 0 && Scale.Y != 0)
+                {
+                    _scale = value;
+                    Debug.Log("value Changed: " + _scale);
+                    
+                    Program.MainGame.frameBuffer.invalidate(_scale);
+                }
+            }
+        }
+
+        public static GameViewWindow instance;
+
+        Debug.SlowDebugger slowDebugger = new Debug.SlowDebugger(1);
+
         public GameViewWindow(Game window)
         {
+            instance = this;
             this.window = window;
         }
+
+        float cooldown;
+        const float cooldownTime = .4f;
 
         public unsafe void Render()
         {
@@ -29,8 +71,17 @@ namespace ZargoEngine.Editor
             int textureID = window.GetFrameBuffer().GetTextureId();
 
             ImGui.SetCursorPos(windowPos);
+            if (cooldown <= 0){
+                ImGui.Image((IntPtr)textureID, windowSize, new Vector2(0, 1), new Vector2(1, 0));
+                cooldown = cooldownTime;
+            }
+            cooldown -= Time.DeltaTime;
 
-            ImGui.Image((IntPtr)textureID, windowSize, new Vector2(0, 1), new Vector2(1, 0));
+            Focused = ImGui.IsWindowFocused();
+            Hovered = ImGui.IsWindowHovered();
+
+            Scale = new OpenTK.Mathematics.Vector2i((int)ImGui.GetWindowWidth(), (int)ImGui.GetWindowHeight());
+
             /*
             var entity = Program.MainGame.firstObject;
             
@@ -47,7 +98,7 @@ namespace ZargoEngine.Editor
             ImGui.End();
         }
 
-        private  Vector2 GetlargestSizeForViewport()
+        private Vector2 GetlargestSizeForViewport()
         {
             var windowSize = ImGui.GetContentRegionAvail();
 

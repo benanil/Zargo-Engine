@@ -1,7 +1,5 @@
 ﻿using ImGuiNET;
-using OpenTK.Mathematics;
 using System;
-using ZargoEngine.Helper;
 
 namespace ZargoEngine.Rendering
 {
@@ -41,8 +39,9 @@ namespace ZargoEngine.Rendering
         public override void DrawGUI()
         {
             // comining
-            ImGui.TextColored(Color4.Orange.ToSystem(), name);
-            ImGui.Text("comining");
+            ImGui.Text("name");
+            ImGui.SameLine();
+            ImGui.Text(mesh.name);
         }
 
         public void Render(in Camera camera)
@@ -65,9 +64,7 @@ namespace ZargoEngine.Rendering
 
         public void Dispose()
         {
-            shader.Dispose();
             mesh.Dispose();
-            texture.Dispose();
             GC.SuppressFinalize(this);
         }
     }

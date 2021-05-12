@@ -4,6 +4,8 @@ using ZargoEngine.Rendering;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ZargoEngine.Bindings;
+using OpenTK.Windowing.Desktop;
+using ZargoEngine.Editor;
 
 namespace ZargoEngine
 {
@@ -79,9 +81,12 @@ namespace ZargoEngine
 
         private void SceneMovement()
         {
-            if (!Input.MouseButtonDown(MouseButton.Right))
+            if (!Input.MouseButtonDown(MouseButton.Right) || (!GameViewWindow.instance.Hovered && !GameViewWindow.instance.Focused)){
+                Program.MainGame.CursorVisible = true;
                 return;
+            }
 
+            Program.MainGame.CursorVisible = false;
             float targetMoveSpeed = Input.GetKey(Keys.LeftShift) ? cameraMoveSpeed * 4 : cameraMoveSpeed;
 
             if (Input.GetKey(Keys.W)) camera.Position += camera.Front * targetMoveSpeed * Time.DeltaTime;

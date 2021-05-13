@@ -49,7 +49,9 @@ namespace ZargoEngine
                 {
                     if (item is ButtonAttribute button)
                     {
-                        if (ImGui.Button(Methods[i].Name, button.size))
+                        // attribute içerisinde özellikle isim belirtilmediyse methodun adını kullan
+                        string buttonName = Methods[i].Name == string.Empty ? Methods[i].Name : button.name; 
+                        if (ImGui.Button(buttonName , button.size))
                         {
                             Methods[i].Invoke(this,null);
                         }
@@ -79,6 +81,7 @@ namespace ZargoEngine
                     SliderAttribute sliderAttribute = default;
                     InputAttribute inputAttribute = default;
 
+                    // drag attribute
                     if (attributes.Any(x =>
                     {
                         if (x.GetType() == typeof(DragAttribute))
@@ -113,6 +116,7 @@ namespace ZargoEngine
                         }
                     }
 
+                    // slider attribute
                     if (attributes.Any(x =>
                     {
                         if (x.GetType() == typeof(SliderAttribute))
@@ -147,6 +151,7 @@ namespace ZargoEngine
                         }
                     }
 
+                    //Input attribute
                     if (attributes.Any(x =>
                     {
                         if (x.GetType() == typeof(InputAttribute))
@@ -182,7 +187,7 @@ namespace ZargoEngine
                     }
                 }
 
-                // drag input slider
+                // if has no attribute draw drag 
 
                 switch (value)
                 {

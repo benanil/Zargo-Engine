@@ -1,5 +1,6 @@
 ﻿
 using OpenTK.Mathematics;
+using ZargoEngine.AssetManagement;
 using ZargoEngine.Editor;
 using ZargoEngine.Sound;
 
@@ -20,7 +21,7 @@ namespace ZargoEngine
 
         public FirstBehaviour()
         {
-            sound = new AudioClip("Sounds/Car Engine start.ogg", false);
+            sound = new AudioClip(AssetManager.GetFileLocation("Sounds/Car Engine start.wav"), false);
             name = "First Behaviour";
         }
 

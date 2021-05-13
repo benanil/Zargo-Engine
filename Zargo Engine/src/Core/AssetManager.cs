@@ -65,6 +65,19 @@ namespace ZargoEngine.AssetManagement
             return true;
         }
 
+        public static string GetFileLocation(string path)
+        {
+            path = AssetsPath + path;
+            string realFile = Directory.GetCurrentDirectory() + "\\" + path;
+            if (!File.Exists(realFile))
+            {
+                Debug.LogError("sound file is not exist:");
+                Debug.LogError(realFile);
+                return null;
+            }
+            return path;
+        }
+
         public void Dispose()
         {
             foreach (var meshPair    in meshes)      meshPair.Value.Dispose();

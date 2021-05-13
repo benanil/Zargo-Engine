@@ -1,4 +1,6 @@
-﻿#define Editor
+﻿#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable IDE0044 // Add readonly modifier
+#define Editor
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -11,6 +13,7 @@ using ZargoEngine.Editor;
 using Dear_ImGui_Sample;
 using ImGuiNET;
 using ZargoEngine.SaveLoad;
+using ZargoEngine.Media.OpenAL;
 
 namespace ZargoEngine
 {
@@ -45,7 +48,9 @@ namespace ZargoEngine
         
         private void LoadScene()
         {
-            skybox = new Skybox();
+            new AudioContext();
+
+            //skybox = new Skybox();
 
             camera    = new Camera(new Vector3(0, 0, 1), ClientRectangle.Size.X/ ClientRectangle.Size.Y,-Vector3.UnitZ);
             var scene = new Scene(camera, "first scene");

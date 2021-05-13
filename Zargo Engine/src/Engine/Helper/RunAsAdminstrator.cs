@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CA1416 // Validate platform compatibility
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Security.Principal;
@@ -41,7 +42,7 @@ namespace ZargoEngine.Helper
                 WindowsPrincipal principal = new WindowsPrincipal(user);
                 isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-            catch (UnauthorizedAccessException ex){
+            catch (UnauthorizedAccessException){
                 isAdmin = false;
             }
             catch (Exception ex){

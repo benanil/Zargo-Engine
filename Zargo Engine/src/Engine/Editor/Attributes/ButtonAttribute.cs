@@ -8,6 +8,7 @@ namespace ZargoEngine.Editor
     public unsafe class ButtonAttribute : Attribute
     {
         public Vector2 size;
+        public string name = string.Empty;
 
         public ButtonAttribute()
         {
@@ -17,6 +18,12 @@ namespace ZargoEngine.Editor
         public ButtonAttribute(Vector2 size)
         {
             this.size = size;
+        }
+
+        public ButtonAttribute(Vector2 size,string name)
+        {
+            this.size = size;
+            this.name = name;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace ZargoEngine.src.Core.Scripting
             var assemblyNames = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic)
                                                     .Select(a => a.Location).ToList();
 
+
             var seksi = Directory.GetCurrentDirectory() + "\\" +"ImGui.NET.dll";
             
             assemblyNames.Add(seksi);
